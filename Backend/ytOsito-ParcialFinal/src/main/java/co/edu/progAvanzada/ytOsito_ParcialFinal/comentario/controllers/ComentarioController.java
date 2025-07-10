@@ -1,4 +1,3 @@
-// ========================= ComentarioController.java =========================
 package co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.controllers;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.entities.Comentario;
