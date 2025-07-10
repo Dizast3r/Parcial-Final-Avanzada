@@ -1,0 +1,209 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+body {
+    background-color: #0f0f0f;
+    display: flex;
+    position: relative;
+}
+
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+/* Mostrar botón cuando la barra lateral está oculta */
+.hamburger-btn.show {
+    display: block;
+}
+
+.hamburger-btn:hover {
+    background-color: #272727;
+}
+
+.hamburger-line {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    margin: 3px 0;
+    transition: 0.3s;
+}
+
+/* Botón hamburguesa interno de la barra lateral */
+.barralateral-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid #3f3f3f;
+    margin-bottom: 8px;
+}
+
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    margin-right: 12px;
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: #272727;
+}
+
+.sidebar-toggle-line {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    margin: 3px 0;
+    transition: 0.3s;
+}
+
+.barralateral-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.barralateral-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Barra lateral */
+.barralateral {
+    width: 240px;
+    height: 100vh;
+    background-color: #0f0f0f;
+    padding: 0;
+    overflow-y: auto;
+    border-right: 1px solid #3f3f3f;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    transition: transform 0.3s ease;
+}
+
+/* Estado oculto de la barra lateral */
+.barralateral.hidden {
+    transform: translateX(-100%);
+}
+
+.barralateral-content {
+    padding: 12px 0;
+}
+
+.barralateral-seccion {
+    margin-bottom: 8px;
+}
+
+.barralateral-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    color: white;
+}
+
+.barralateral-item:hover {
+    background-color: #272727;
+}
+
+.barralateral-item.active {
+    background-color: #272727;
+}
+
+.barralateral-item .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 24px;
+    fill: white;
+}
+
+.barralateral-item .text {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.dividir {
+    height: 1px;
+    background-color: #3f3f3f;
+    margin: 12px 0;
+}
+
+.section-title {
+    padding: 8px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+}
+
+.contenido-principal {
+    flex: 1;
+    margin-left: 240px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Cuando la barra lateral está oculta, expandir contenido principal */
+.contenido-principal.expanded {
+    margin-left: 0;
+}
+
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: block;
+    }
+
+    .barralateral {
+        transform: translateX(-100%);
+    }
+
+    .barralateral.active {
+        transform: translateX(0);
+    }
+
+    .contenido-principal {
+        margin-left: 0;
+        padding-top: 70px;
+    }
+
+    body {
+        flex-direction: column;
+    }
+}
+
+/* En desktop, mostrar el botón cuando la barra lateral está oculta */
+@media (min-width: 769px) {
+    .hamburger-btn.show {
+        display: block;
+    }
+}

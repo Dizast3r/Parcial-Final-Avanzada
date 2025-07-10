@@ -3,7 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
-    color: blue;
+    color: black;
 }
 
 body {
@@ -20,45 +20,63 @@ body {
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 600px; /* Aumentado para acomodar dos columnas */
     text-align: center;
 }
 
-h1 {
+h1, h2 {
     margin-bottom: 1.5rem;
-    color: red;
+    color: black;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
     gap: 1.2rem;
+    text-align: left;
+}
+
+/* Campos que ocupan toda la fila */
+.full-width {
+    grid-column: 1 / -1;
 }
 
 label {
     text-align: left;
     color: #444;
     font-weight: bold;
+    margin-bottom: 0.3rem;
 }
 
-input[type="email"],
-input[type="password"],
-input[type="password"],
-input[type="text"],
-input[type="date"] {
+select[name="sexo"], 
+input[type="text"], 
+input[type="email"], 
+input[type="password"] {
     padding: 0.75rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    width: 100%;
 }
 
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="password"]:focus,
-input[type="text"]:focus,
-input[type="date"]:focus {
-    border-color: #cc0000;
+/* Específico para el select */
+select[name="sexo"] {
+    background-color: white;
+    color: black; /* Texto negro para el select */
+}
+
+/* Opciones del select */
+select[name="sexo"] option {
+    color: black;
+    background-color: white;
+}
+
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="password"]:focus, 
+select[name="sexo"]:focus {
+    border-color: gray;
     outline: none;
 }
 
@@ -71,6 +89,7 @@ button[type="submit"] {
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.3s ease;
+    grid-column: 1 / -1; /* Botón ocupa toda la fila */
 }
 
 button[type="submit"]:hover {
