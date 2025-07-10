@@ -43,7 +43,7 @@ label {
     font-weight: bold;
 }
 
-input[type="email"],
+input[type="nombreUsuario"],
 input[type="password"] {
     padding: 0.75rem;
     border: 1px solid #ccc;
@@ -54,7 +54,7 @@ input[type="password"] {
 
 input[type="email"]:focus,
 input[type="password"]:focus {
-    border-color: #cc0000;
+    border-color: bl;
     outline: none;
 }
 
@@ -76,7 +76,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #480c63;
+    background-color: #7614a3;
 }
 
 p {
