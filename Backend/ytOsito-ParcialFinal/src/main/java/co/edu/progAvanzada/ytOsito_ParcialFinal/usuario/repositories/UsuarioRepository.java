@@ -14,9 +14,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
     
-    boolean emailAlreadyExist(String email);
+    boolean existsByEmail(String email);
     
-    boolean nicknameAlreadyExist(String nickname);
+    boolean existsByNickname(String nickname);
     
     Optional<Usuario> findByNickname(String nickname);
+    
+    Usuario findByNicknameAndPassword(String nickname, String password);
 }

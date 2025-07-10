@@ -27,10 +27,10 @@ public class UsuarioService {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuario no puede ser null");
         }
-        if (usuarioRepository.emailAlreadyExist(usuario.getEmail())) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new EntityExistsException("Ya existe alguien con el email: " + usuario.getEmail());
         }
-        if (usuarioRepository.nicknameAlreadyExist(usuario.getNickname())) {
+        if (usuarioRepository.existsByNickname(usuario.getNickname())) {
             throw new EntityExistsException("Ese nickname ya ha sido usado por otro usuario");
         }
         return usuarioRepository.save(usuario);
@@ -56,4 +56,13 @@ public class UsuarioService {
     public List<Usuario> buscarTodosLosUsuarios() {
         return usuarioRepository.findAll();
     }
+    
+    public Usuario iniciarSesion(String nickname, String password) {
+    Usuario usuario = usuarioRepository.findByNicknameAndPassword(nickname, password);
+    if (usuario == null) {
+        throw new EntityNotFoundException("Credenciales inválidas");
+    }
+    
+    return usuario;
+}
 }

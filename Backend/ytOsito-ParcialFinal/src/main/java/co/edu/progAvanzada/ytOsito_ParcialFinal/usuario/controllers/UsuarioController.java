@@ -6,6 +6,7 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.controllers;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.services.UsuarioService;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,17 +28,22 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/registro")
-    public Usuario registrarUsuario(@RequestBody Usuario usuario) {
+    public Usuario registrarUsuario(@Valid@RequestBody Usuario usuario) {
         return usuarioService.registrarUsuario(usuario);
     }
 
     @GetMapping("/{id}")
-    public Usuario obtenerUsuarioById(@PathVariable Long id) {
+    public Usuario obtenerUsuarioById(@Valid@PathVariable Long id) {
         return usuarioService.buscarUsuarioPorId(id);
     }
 
     @GetMapping("/nickname={nickname}")
-    public Optional<Usuario> obtenerUsuariosPorNickname(@PathVariable String nickname) {
+    public Optional<Usuario> obtenerUsuariosPorNickname(@Valid@PathVariable String nickname) {
         return usuarioService.buscarUsuarioPorNickname(nickname);
+    }
+    
+    @PostMapping("/login")
+    public Usuario iniciarSesion(@Valid@RequestBody Usuario usuario) {
+        return usuarioService.iniciarSesion(usuario.getNickname(), usuario.getPassword());
     }
 }

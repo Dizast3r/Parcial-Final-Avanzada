@@ -4,16 +4,20 @@
  */
 package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities;
 
+import co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.entities.Comentario;
+import co.edu.progAvanzada.ytOsito_ParcialFinal.likes.entities.Like;
+import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +35,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Usuario")
+@Table(name = "usuario")
 
 public class Usuario extends Persona {
 
@@ -57,9 +61,14 @@ public class Usuario extends Persona {
     )
     @Column(nullable = false)
     private String password;
-
-    @NotNull
-    @Column(name = "fecha_union", nullable = false)
-    private LocalDate fechaUnion;
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
+    private List<Video> videos;
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
+    private List<Comentario> comentarios;
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
+    private List<Like> videosLikeados;
 
 }
