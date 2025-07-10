@@ -37,7 +37,7 @@ public class UsuarioService {
         if (usuarioRepository.existsByNickname(usuario.getNickname())) {
             throw new EntityExistsException("Ese nickname ya ha sido usado por otro usuario");
         }
-        emailService.enviarEmailRegistro(usuario.getEmail());
+        //emailService.enviarEmailRegistro(usuario.getEmail());
         return usuarioRepository.save(usuario);
     }
 
@@ -68,5 +68,57 @@ public class UsuarioService {
         }
 
         return usuario;
+    }
+
+    public Usuario suscribirseAUsuario(Long suscriptorId, Long suscritoId) {
+        if (suscriptorId.equals(suscritoId)) {
+            throw new IllegalArgumentException("Un usuario no puede suscribirse a sí mismo");
+        }
+
+        Usuario suscriptor = usuarioRepository.findById(suscriptorId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario suscriptor no encontrado con ID: " + suscriptorId));
+
+        Usuario suscrito = usuarioRepository.findById(suscritoId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario a suscribirse no encontrado con ID: " + suscritoId));
+
+        if (usuarioRepository.existsSuscripcion(suscriptorId, suscritoId)) {
+            throw new EntityExistsException("Ya existe una suscripción entre estos usuarios");
+        }
+
+        suscriptor.getSuscripciones().add(suscrito);
+        return usuarioRepository.save(suscriptor);
+    }
+
+    public Usuario desuscribirseDeUsuario(Long suscriptorId, Long suscritoId) {
+        Usuario suscriptor = usuarioRepository.findById(suscriptorId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario suscriptor no encontrado con ID: " + suscriptorId));
+
+        Usuario suscrito = usuarioRepository.findById(suscritoId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario a desuscribirse no encontrado con ID: " + suscritoId));
+
+        if (!usuarioRepository.existsSuscripcion(suscriptorId, suscritoId)) {
+            throw new EntityNotFoundException("No existe una suscripción entre estos usuarios");
+        }
+
+        suscriptor.getSuscripciones().remove(suscrito);
+        return usuarioRepository.save(suscriptor);
+    }
+
+    public List<Usuario> obtenerSuscripciones(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new EntityNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        return usuarioRepository.findSuscripcionesByUsuarioId(usuarioId);
+    }
+
+    public List<Usuario> obtenerSuscriptores(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new EntityNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        return usuarioRepository.findSuscriptoresByUsuarioId(usuarioId);
+    }
+
+    public boolean estaSuscrito(Long suscriptorId, Long suscritoId) {
+        return usuarioRepository.existsSuscripcion(suscriptorId, suscritoId);
     }
 }

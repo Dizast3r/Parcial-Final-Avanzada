@@ -6,12 +6,17 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.entities;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -27,32 +32,40 @@ import lombok.NoArgsConstructor;
  * @author User
  */
 @Entity
+@Table(name = "comentario")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "comentario")
 public class Comentario {
-    
-    @Id
+
+    @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank
-    @Size(min = 1, max = 50)
-    @Column(nullable = false, length = 50)
+
+    @NotBlank 
+    @Size(min = 1, max = 300)
+    @Column(nullable = false, length = 300)
     private String comentario;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Video video;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Usuario usuario;
-    
+
     @Column(nullable = false)
     private LocalDateTime fechaDeCreacion;
-    
+
+    // ——————— Usuario cargado siempre y serializado completo ——————— 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties({ 
+        "hibernateLazyInitializer", "handler",
+        "videos", "comentarios", "videosLikeados"
+    })
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "video_id")
+    @JsonIgnore
+    private Video video;
+
     @PrePersist
     public void prePersist() {
-        fechaDeCreacion = LocalDateTime.now();
+        this.fechaDeCreacion = LocalDateTime.now();
     }
 }

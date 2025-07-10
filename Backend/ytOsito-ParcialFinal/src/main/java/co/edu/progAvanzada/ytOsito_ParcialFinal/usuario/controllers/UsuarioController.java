@@ -7,8 +7,10 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.controllers;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.services.UsuarioService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +45,33 @@ public class UsuarioController {
     }
     
     @PostMapping("/login")
-    public Usuario iniciarSesion(@Valid@RequestBody Usuario usuario) {
+    public Usuario iniciarSesion(@RequestBody Usuario usuario) { //Este no tiene valid, porque o si no valida que los demas campos esten vacios y pues no hace falta, si algo se tirara error
+            System.out.println("➡️ Login recibido: " + usuario.getNickname() + "/" + usuario.getPassword());
         return usuarioService.iniciarSesion(usuario.getNickname(), usuario.getPassword());
+    }
+
+    @PostMapping("/{suscriptorId}/suscribirse/{suscritoId}")
+    public Usuario suscribirseAUsuario(@Valid@PathVariable Long suscriptorId, @Valid@PathVariable Long suscritoId) {
+        return usuarioService.suscribirseAUsuario(suscriptorId, suscritoId);
+    }
+
+    @DeleteMapping("/{suscriptorId}/desuscribirse/{suscritoId}")
+    public Usuario desuscribirseDeUsuario(@Valid@PathVariable Long suscriptorId, @Valid@PathVariable Long suscritoId) {
+        return usuarioService.desuscribirseDeUsuario(suscriptorId, suscritoId);
+    }
+
+    @GetMapping("/{usuarioId}/suscripciones")
+    public List<Usuario> obtenerSuscripciones(@Valid@PathVariable Long usuarioId) {
+        return usuarioService.obtenerSuscripciones(usuarioId);
+    }
+
+    @GetMapping("/{usuarioId}/suscriptores")
+    public List<Usuario> obtenerSuscriptores(@Valid@PathVariable Long usuarioId) {
+        return usuarioService.obtenerSuscriptores(usuarioId);
+    }
+
+    @GetMapping("/{suscriptorId}/esta-suscrito/{suscritoId}")
+    public boolean estaSuscrito(@Valid@PathVariable Long suscriptorId, @Valid@PathVariable Long suscritoId) {
+        return usuarioService.estaSuscrito(suscriptorId, suscritoId);
     }
 }

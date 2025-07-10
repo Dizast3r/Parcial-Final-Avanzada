@@ -6,6 +6,9 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.likes.entities;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,6 +33,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "likes")
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id"
+)
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Like {
     
     @Id

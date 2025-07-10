@@ -7,10 +7,14 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.entities.Comentario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.likes.entities.Like;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -36,6 +40,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "usuario")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 
 public class Usuario extends Persona {
 
@@ -61,14 +66,31 @@ public class Usuario extends Persona {
     )
     @Column(nullable = false)
     private String password;
-    
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
+
     private List<Video> videos;
-    
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
+
     private List<Comentario> comentarios;
-    
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
+
     private List<Like> videosLikeados;
 
+    // Usuarios a los que este usuario está suscrito
+    @ManyToMany
+    @JoinTable(
+        name = "suscripciones",
+        joinColumns = @JoinColumn(name = "suscriptor_id"),
+        inverseJoinColumns = @JoinColumn(name = "suscrito_id")
+    )
+    @JsonIgnoreProperties({"suscripciones", "suscriptores", "videos", "comentarios", "videosLikeados"})
+    private List<Usuario> suscripciones;
+
+    // Usuarios que están suscritos a este usuario
+    @ManyToMany(mappedBy = "suscripciones")
+    @JsonIgnoreProperties({"suscripciones", "suscriptores", "videos", "comentarios", "videosLikeados"})
+    private List<Usuario> suscriptores;
 }
