@@ -4,6 +4,7 @@
  */
 package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.services;
 
+import co.edu.progAvanzada.ytOsito_ParcialFinal.email.services.EmailService;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.repositories.UsuarioRepository;
 import jakarta.persistence.EntityExistsException;
@@ -23,6 +24,9 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public Usuario registrarUsuario(Usuario usuario) {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuario no puede ser null");
@@ -33,6 +37,7 @@ public class UsuarioService {
         if (usuarioRepository.existsByNickname(usuario.getNickname())) {
             throw new EntityExistsException("Ese nickname ya ha sido usado por otro usuario");
         }
+        emailService.enviarEmailRegistro(usuario.getEmail());
         return usuarioRepository.save(usuario);
     }
 
@@ -42,11 +47,10 @@ public class UsuarioService {
         }
         usuarioRepository.deleteById(id);
     }
-    
+
     public Optional<Usuario> buscarUsuarioPorNickname(String nickname) {
         return usuarioRepository.findByNickname(nickname);
     }
-    
 
     public Usuario buscarUsuarioPorId(Long id) {
         return usuarioRepository.findById(id)
@@ -56,13 +60,13 @@ public class UsuarioService {
     public List<Usuario> buscarTodosLosUsuarios() {
         return usuarioRepository.findAll();
     }
-    
+
     public Usuario iniciarSesion(String nickname, String password) {
-    Usuario usuario = usuarioRepository.findByNicknameAndPassword(nickname, password);
-    if (usuario == null) {
-        throw new EntityNotFoundException("Credenciales inválidas");
+        Usuario usuario = usuarioRepository.findByNicknameAndPassword(nickname, password);
+        if (usuario == null) {
+            throw new EntityNotFoundException("Credenciales inválidas");
+        }
+
+        return usuario;
     }
-    
-    return usuario;
-}
 }
