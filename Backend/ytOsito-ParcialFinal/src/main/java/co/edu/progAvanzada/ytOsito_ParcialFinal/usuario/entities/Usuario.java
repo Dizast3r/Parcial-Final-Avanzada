@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.entities.Comentario;
@@ -29,8 +25,15 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- *
- * @author User
+ * Entidad que representa un usuario del sistema ytOsito.
+ * Extiende de Persona para heredar atributos básicos como nombre, ciudad de nacimiento, etc.
+ * 
+ * Implementa un sistema de suscripciones bidireccional entre usuarios, permitiendo
+ * que los usuarios se suscriban entre sí y mantengan listas de videos, comentarios y likes.
+ * 
+ * @author Jorge Miguel Mendez Baron
+ * @author Jose David Cucanchon Ramirez
+ * @author Edgar Julian Rojas Roldan
  */
 @Entity
 @DiscriminatorValue("USUARIO")
@@ -41,22 +44,33 @@ import lombok.ToString;
 @AllArgsConstructor
 @Table(name = "usuario")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-
 public class Usuario extends Persona {
 
+    /**
+     * Nombre de usuario único en el sistema.
+     * Debe tener entre 3 y 50 caracteres.
+     */
     @NotBlank
     @Size(min = 3, max = 50)
     @Column(nullable = false, unique = true, length = 50)
     private String nickname;
 
+    /**
+     * Correo electrónico del usuario.
+     * Debe ser una dirección de email válida y única en el sistema.
+     */
     @Email
     @Column(name = "correo", nullable = false)
     private String email;
 
     /**
-     * La contraseña debe tener: - al menos una mayúscula - al menos una
-     * minúscula - al menos un número - al menos un carácter especial @$!%*?& -
-     * mínimo 8 caracteres de longitud
+     * Contraseña del usuario con validación de seguridad.
+     * Debe cumplir los siguientes requisitos:
+     * - Al menos una letra minúscula
+     * - Al menos una letra mayúscula
+     * - Al menos un número
+     * - Al menos un carácter especial (@$!%*?&)
+     * - Mínimo 8 caracteres de longitud
      */
     @NotBlank
     @Pattern(
@@ -67,19 +81,32 @@ public class Usuario extends Persona {
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Lista de videos publicados por el usuario.
+     * Relación OneToMany con eliminación en cascada.
+     */
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
-
     private List<Video> videos;
 
+    /**
+     * Lista de comentarios realizados por el usuario.
+     * Relación OneToMany con eliminación en cascada.
+     */
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
-
     private List<Comentario> comentarios;
 
+    /**
+     * Lista de likes dados por el usuario a diferentes videos.
+     * Relación OneToMany con eliminación en cascada.
+     */
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
-
     private List<Like> videosLikeados;
 
-    // Usuarios a los que este usuario está suscrito
+    /**
+     * Lista de usuarios a los que este usuario está suscrito.
+     * Relación ManyToMany que utiliza una tabla intermedia "suscripciones".
+     * Se ignoran ciertas propiedades en la serialización JSON para evitar recursión infinita.
+     */
     @ManyToMany
     @JoinTable(
         name = "suscripciones",
@@ -89,7 +116,11 @@ public class Usuario extends Persona {
     @JsonIgnoreProperties({"suscripciones", "suscriptores", "videos", "comentarios", "videosLikeados"})
     private List<Usuario> suscripciones;
 
-    // Usuarios que están suscritos a este usuario
+    /**
+     * Lista de usuarios que están suscritos a este usuario.
+     * Lado inverso de la relación ManyToMany de suscripciones.
+     * Se ignoran ciertas propiedades en la serialización JSON para evitar recursión infinita.
+     */
     @ManyToMany(mappedBy = "suscripciones")
     @JsonIgnoreProperties({"suscripciones", "suscriptores", "videos", "comentarios", "videosLikeados"})
     private List<Usuario> suscriptores;
