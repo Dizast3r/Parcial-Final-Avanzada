@@ -102,4 +102,41 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'canal.html';
         });
     }
+
+    // Cargar todos los videos publicados usando el endpoint correcto /video/todos
+    async function cargarVideosTodosPrincipal() {
+        try {
+            const resp = await fetch('https://parcial-final-avanzada-production-cdde.up.railway.app/video/todos');
+            const videos = await resp.json();
+            if (Array.isArray(videos) && videos.length > 0) {
+                mostrarVideosPrincipal(videos);
+            } else {
+                document.getElementById('contenidoPrincipal').innerHTML = '<h2>No hay videos publicados aún.</h2>';
+            }
+        } catch {
+            document.getElementById('contenidoPrincipal').innerHTML = '<h2>Error al cargar los videos.</h2>';
+        }
+    }
+
+    // Mostrar solo miniatura y título de cada video en la sección de inicio
+    function mostrarVideosPrincipal(videos) {
+        const cont = document.getElementById('contenidoPrincipal');
+        cont.innerHTML = '<div class="videos-grid"></div>';
+        const grid = cont.querySelector('.videos-grid');
+        videos.reverse().forEach(video => {
+            const div = document.createElement('div');
+            div.className = 'video-card-inicio';
+            div.innerHTML = `
+                <div class="video-thumb-container">
+                    <img src="${video.miniatura_src}" alt="Miniatura" class="video-thumb-inicio">
+                </div>
+                <div class="video-info-inicio">
+                    <h3 class="video-title-inicio">${video.titulo}</h3>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    cargarVideosTodosPrincipal();
 });
