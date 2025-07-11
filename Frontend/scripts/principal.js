@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('nickname');
+            localStorage.removeItem('userId');
             alert('Sesión cerrada correctamente.');
             window.location.href = 'login.html';
         });
@@ -142,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Al hacer click en la miniatura, mostrar el video en grande
                 card.querySelector('.video-thumb').addEventListener('click', () => {
                     if (videoSrc) {
-                        mostrarModalVideo(videoSrc, titulo);
+                        mostrarModalVideo(videoSrc, titulo, video);
                         // Incrementar vistas cuando se reproduce el video
                         incrementarVistas(video.id);
                     }
@@ -167,44 +168,382 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function mostrarModalVideo(url, titulo) {
-        let overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = 0;
-        overlay.style.left = 0;
-        overlay.style.width = '100vw';
-        overlay.style.height = '100vh';
-        overlay.style.background = 'rgba(0,0,0,0.8)';
-        overlay.style.zIndex = 3000;
-        overlay.style.display = 'flex';
-        overlay.style.justifyContent = 'center';
-        overlay.style.alignItems = 'center';
+    // Función mejorada para mostrar el modal de video estilo YouTube
+    function mostrarModalVideo(url, titulo, videoData) {
+        const overlay = document.createElement('div');
+        overlay.className = 'video-modal-overlay';
         overlay.innerHTML = `
-            <div style="background:#232323;padding:2rem 2.5rem;border-radius:18px;box-shadow:0 4px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;align-items:center;">
-                <h2 style="color:#fff;margin-bottom:1.2rem;">${titulo}</h2>
-                <video src="${url}" controls autoplay style="width:480px;max-width:80vw;height:270px;max-height:60vh;border-radius:12px;background:#000;"></video>
-                <button id="cerrarModalVideo" style="margin-top:1.5rem;padding:0.6rem 2rem;background:#7614a3;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Cerrar</button>
+            <div class="video-modal-container">
+                <div class="video-modal-content">
+                    <!-- Sección principal del video -->
+                    <div class="video-main-section">
+                        <div class="video-player-container">
+                            <video src="${url}" controls autoplay class="video-player">
+                                Tu navegador no soporta el elemento video.
+                            </video>
+                            <button class="modal-close-btn" id="cerrarModalVideo">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Información del video -->
+                        <div class="video-info-section">
+                            <h1 class="video-title-modal">${titulo}</h1>
+                            
+                            <!-- Estadísticas y acciones -->
+                            <div class="video-stats-actions">
+                                <div class="video-stats">
+                                    <span class="views-count">${videoData.vistas || 0} visualizaciones</span>
+                                </div>
+                                
+                                <div class="video-actions">
+                                    <button class="action-btn like-btn" data-video-id="${videoData.id}" data-action="like">
+                                        <svg viewBox="0 0 24 24" width="20" height="20">
+                                            <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                                        </svg>
+                                        <span class="like-count">0</span>
+                                    </button>
+                                    
+                                    <button class="action-btn dislike-btn" data-video-id="${videoData.id}" data-action="dislike">
+                                        <svg viewBox="0 0 24 24" width="20" height="20">
+                                            <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/>
+                                        </svg>
+                                        <span class="dislike-count">0</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Información del canal -->
+                            <div class="channel-info">
+                                <div class="channel-avatar">
+                                    <span class="avatar-icon">${videoData.usuario?.nickname ? videoData.usuario.nickname.charAt(0).toUpperCase() : 'U'}</span>
+                                </div>
+                                <div class="channel-details">
+                                    <div class="channel-name">${videoData.usuario?.nickname || 'Usuario desconocido'}</div>
+                                    <div class="subscriber-count">0 suscriptores</div>
+                                </div>
+                                <button class="subscribe-btn" data-user-id="${videoData.usuario?.id || ''}">
+                                    SUSCRIBIRSE
+                                </button>
+                            </div>
+                            
+                            <!-- Descripción del video -->
+                            <div class="video-description">
+                                <div class="description-content">
+                                    <p>${videoData.Descripcion || videoData.descripcion || 'Sin descripción'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sección de comentarios -->
+                    <div class="comments-section">
+                        <div class="comments-header">
+                            <h3>Comentarios</h3>
+                            <span class="comments-count" id="commentsCount">0</span>
+                        </div>
+                        
+                        <!-- Formulario para agregar comentario -->
+                        <div class="add-comment-section">
+                            <div class="comment-avatar">
+                                <span class="avatar-icon">${localStorage.getItem('nickname')?.charAt(0).toUpperCase() || 'U'}</span>
+                            </div>
+                            <div class="comment-input-container">
+                                <textarea 
+                                    class="comment-input" 
+                                    placeholder="Agrega un comentario..." 
+                                    id="newCommentText"
+                                ></textarea>
+                                <div class="comment-actions">
+                                    <button class="comment-cancel-btn">CANCELAR</button>
+                                    <button class="comment-submit-btn" id="submitComment" data-video-id="${videoData.id}">COMENTAR</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lista de comentarios -->
+                        <div class="comments-list" id="commentsList">
+                            <!-- Los comentarios se cargarán aquí dinámicamente -->
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
+        
         document.body.appendChild(overlay);
         
-        // Cerrar modal con click en el botón
-        document.getElementById('cerrarModalVideo').onclick = () => overlay.remove();
+        // Configurar event listeners
+        setupModalEventListeners(overlay, videoData);
         
-        // Cerrar modal con click fuera del contenido
+        // Cargar datos iniciales
+        cargarLikesYDislikes(videoData.id);
+        cargarComentarios(videoData.id);
+        verificarEstadoSuscripcion(videoData.usuario?.id);
+    }
+
+    // Configurar todos los event listeners del modal
+    function setupModalEventListeners(overlay, videoData) {
+        // Cerrar modal
+        overlay.querySelector('#cerrarModalVideo').onclick = () => overlay.remove();
+        
+        // Cerrar con click fuera del contenido
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
                 overlay.remove();
             }
         });
         
-        // Cerrar modal con tecla Escape
-        document.addEventListener('keydown', function escapeHandler(e) {
+        // Cerrar con Escape
+        const escapeHandler = (e) => {
             if (e.key === 'Escape') {
                 overlay.remove();
                 document.removeEventListener('keydown', escapeHandler);
             }
+        };
+        document.addEventListener('keydown', escapeHandler);
+        
+        // Like/Dislike buttons
+        overlay.querySelector('.like-btn').addEventListener('click', (e) => {
+            darLikeDislike(videoData.id, true);
         });
+        
+        overlay.querySelector('.dislike-btn').addEventListener('click', (e) => {
+            darLikeDislike(videoData.id, false);
+        });
+        
+        // Subscribe button
+        overlay.querySelector('.subscribe-btn').addEventListener('click', (e) => {
+            const usuarioId = e.target.dataset.userId;
+            if (usuarioId) {
+                suscribirseAUsuario(usuarioId);
+            }
+        });
+        
+        // Submit comment
+        overlay.querySelector('#submitComment').addEventListener('click', (e) => {
+            enviarComentario(videoData.id);
+        });
+        
+        // Cancel comment
+        overlay.querySelector('.comment-cancel-btn').addEventListener('click', () => {
+            overlay.querySelector('#newCommentText').value = '';
+            overlay.querySelector('#newCommentText').blur();
+        });
+        
+        // Auto-resize textarea
+        const textarea = overlay.querySelector('#newCommentText');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+        
+        // Mostrar/ocultar acciones de comentario
+        textarea.addEventListener('focus', function() {
+            overlay.querySelector('.comment-actions').style.opacity = '1';
+        });
+        
+        textarea.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                overlay.querySelector('.comment-actions').style.opacity = '0';
+            }
+        });
+    }
+
+    // Función para dar like/dislike
+    async function darLikeDislike(videoId, isLike) {
+        try {
+            const usuarioId = obtenerUsuarioIdActual();
+            if (!usuarioId) {
+                alert('Debes iniciar sesión para dar like/dislike');
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/like/dar/${videoId}/${usuarioId}/${isLike}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                cargarLikesYDislikes(videoId);
+            }
+        } catch (error) {
+            console.error('Error al dar like/dislike:', error);
+        }
+    }
+
+    // Función para cargar likes y dislikes
+    async function cargarLikesYDislikes(videoId) {
+        try {
+            const [likesResponse, dislikesResponse] = await Promise.all([
+                fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/like/contar/likes/${videoId}`),
+                fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/like/contar/dislikes/${videoId}`)
+            ]);
+            
+            const likes = await likesResponse.text();
+            const dislikes = await dislikesResponse.text();
+            
+            const likeCountEl = document.querySelector('.like-count');
+            const dislikeCountEl = document.querySelector('.dislike-count');
+            
+            if (likeCountEl) likeCountEl.textContent = likes;
+            if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
+        } catch (error) {
+            console.error('Error al cargar likes/dislikes:', error);
+        }
+    }
+
+    // Función para cargar comentarios
+    async function cargarComentarios(videoId) {
+        try {
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/video/${videoId}`);
+            const comentarios = await response.json();
+            
+            const commentsList = document.getElementById('commentsList');
+            const commentsCount = document.getElementById('commentsCount');
+            
+            if (commentsCount) commentsCount.textContent = comentarios.length;
+            
+            if (commentsList) {
+                commentsList.innerHTML = comentarios.map(comentario => `
+                    <div class="comment-item">
+                        <div class="comment-avatar">
+                            <span class="avatar-icon">${comentario.usuario?.nickname?.charAt(0).toUpperCase() || 'U'}</span>
+                        </div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">${comentario.usuario?.nickname || 'Usuario'}</span>
+                                <span class="comment-date">${formatearFecha(comentario.fechaDeCreacion)}</span>
+                            </div>
+                            <div class="comment-text">${comentario.comentario}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Error al cargar comentarios:', error);
+        }
+    }
+
+    // Función para enviar comentario
+    async function enviarComentario(videoId) {
+        try {
+            const usuarioId = obtenerUsuarioIdActual();
+            if (!usuarioId) {
+                alert('Debes iniciar sesión para comentar');
+                return;
+            }
+            
+            const comentarioTexto = document.getElementById('newCommentText').value.trim();
+            if (!comentarioTexto) {
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/crear/${videoId}/${usuarioId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(comentarioTexto)
+            });
+            
+            if (response.ok) {
+                document.getElementById('newCommentText').value = '';
+                document.querySelector('.comment-actions').style.opacity = '0';
+                cargarComentarios(videoId);
+            }
+        } catch (error) {
+            console.error('Error al enviar comentario:', error);
+        }
+    }
+
+    // Función para suscribirse a un usuario
+    async function suscribirseAUsuario(usuarioSuscritoId) {
+        try {
+            const usuarioSuscriptorId = obtenerUsuarioIdActual();
+            if (!usuarioSuscriptorId) {
+                alert('Debes iniciar sesión para suscribirte');
+                return;
+            }
+            
+            if (usuarioSuscriptorId === usuarioSuscritoId) {
+                alert('No puedes suscribirte a ti mismo');
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/suscribirse/${usuarioSuscritoId}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                const subscribeBtn = document.querySelector('.subscribe-btn');
+                if (subscribeBtn) {
+                    subscribeBtn.textContent = 'SUSCRITO';
+                    subscribeBtn.classList.add('subscribed');
+                    subscribeBtn.disabled = true;
+                }
+            } else {
+                const errorText = await response.text();
+                alert('Error al suscribirse: ' + errorText);
+            }
+        } catch (error) {
+            console.error('Error al suscribirse:', error);
+        }
+    }
+
+    // Función para verificar estado de suscripción
+    async function verificarEstadoSuscripcion(usuarioSuscritoId) {
+        try {
+            const usuarioSuscriptorId = obtenerUsuarioIdActual();
+            if (!usuarioSuscriptorId || !usuarioSuscritoId) return;
+            
+            if (usuarioSuscriptorId === usuarioSuscritoId) {
+                // Si es el propio usuario, ocultar el botón de suscripción
+                const subscribeBtn = document.querySelector('.subscribe-btn');
+                if (subscribeBtn) {
+                    subscribeBtn.style.display = 'none';
+                }
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/esta-suscrito/${usuarioSuscritoId}`);
+            const estaSuscrito = await response.json();
+            
+            if (estaSuscrito) {
+                const subscribeBtn = document.querySelector('.subscribe-btn');
+                if (subscribeBtn) {
+                    subscribeBtn.textContent = 'SUSCRITO';
+                    subscribeBtn.classList.add('subscribed');
+                    subscribeBtn.disabled = true;
+                }
+            }
+        } catch (error) {
+            console.error('Error al verificar suscripción:', error);
+        }
+    }
+
+    // Función auxiliar para obtener el ID del usuario actual
+    function obtenerUsuarioIdActual() {
+        return localStorage.getItem('userId');
+    }
+
+    // Función auxiliar para formatear fechas
+    function formatearFecha(fechaString) {
+        const fecha = new Date(fechaString);
+        const ahora = new Date();
+        const diferencia = ahora - fecha;
+        
+        const minutos = Math.floor(diferencia / (1000 * 60));
+        const horas = Math.floor(diferencia / (1000 * 60 * 60));
+        const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+        
+        if (minutos < 60) {
+            return `hace ${minutos} minutos`;
+        } else if (horas < 24) {
+            return `hace ${horas} horas`;
+        } else {
+            return `hace ${dias} días`;
+        }
     }
 
     // Cargar los videos al inicio

@@ -384,6 +384,381 @@ body {
     align-items: center;
 }
 
+/* Estilos para el modal de video estilo YouTube */
+.video-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.video-modal-container {
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    background: #0f0f0f;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.video-modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+/* Sección principal del video */
+.video-main-section {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 24px 24px 24px;
+}
+
+.video-player-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.video-player {
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    max-height: 60vh;
+    background: #000;
+    outline: none;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.modal-close-btn svg {
+    fill: white;
+}
+
+/* Información del video */
+.video-info-section {
+    padding: 16px 0;
+}
+
+.video-title-modal {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+}
+
+.video-stats-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #3f3f3f;
+}
+
+.video-stats {
+    color: #aaa;
+    font-size: 0.95rem;
+}
+
+.video-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.action-btn svg {
+    fill: currentColor;
+}
+
+/* Información del canal */
+.channel-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #3f3f3f;
+}
+
+.channel-avatar {
+    width: 40px;
+    height: 40px;
+    background: #7614a3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+}
+
+.avatar-icon {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.channel-details {
+    flex: 1;
+}
+
+.channel-name {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.subscriber-count {
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+.subscribe-btn {
+    background: #cc0000;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.subscribe-btn:hover {
+    background: #aa0000;
+}
+
+.subscribe-btn.subscribed {
+    background: #3f3f3f;
+    color: #aaa;
+}
+
+/* Descripción del video */
+.video-description {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 24px;
+}
+
+.description-content p {
+    color: #fff;
+    line-height: 1.4;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Sección de comentarios */
+.comments-section {
+    background: #0f0f0f;
+    padding: 24px;
+    border-top: 1px solid #3f3f3f;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.comments-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.comments-header h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.comments-count {
+    color: #aaa;
+    font-size: 1rem;
+}
+
+/* Agregar comentario */
+.add-comment-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    background: #7614a3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.comment-input-container {
+    flex: 1;
+}
+
+.comment-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #3f3f3f;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 8px 0;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    min-height: 20px;
+    max-height: 100px;
+}
+
+.comment-input:focus {
+    border-bottom-color: #7614a3;
+}
+
+.comment-input::placeholder {
+    color: #aaa;
+}
+
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.comment-input:focus + .comment-actions,
+.comment-actions:focus-within {
+    opacity: 1;
+}
+
+.comment-cancel-btn,
+.comment-submit-btn {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    padding: 8px 16px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.comment-submit-btn {
+    background: #7614a3;
+    color: white;
+}
+
+.comment-submit-btn:hover {
+    background: #8a1bb5;
+}
+
+.comment-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Lista de comentarios */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 12px;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.comment-author {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.comment-date {
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+.comment-text {
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .navbar-left {
@@ -413,6 +788,45 @@ body {
 
     .contenido-principal.mini-sidebar {
         margin-left: 0;
+    }
+    
+    /* Modal responsive */
+    .video-modal-overlay {
+        padding: 10px;
+    }
+    
+    .video-modal-container {
+        max-width: 100%;
+        max-height: 95vh;
+    }
+    
+    .video-main-section {
+        padding: 0 16px 16px 16px;
+    }
+    
+    .comments-section {
+        padding: 16px;
+    }
+    
+    .video-title-modal {
+        font-size: 1.3rem;
+    }
+    
+    .video-stats-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .channel-info {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .subscribe-btn {
+        order: -1;
+        width: 100%;
+        text-align: center;
     }
 }
 
