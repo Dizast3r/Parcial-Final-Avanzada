@@ -80,8 +80,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (Array.isArray(videos) && videos.length > 0) {
                 videosDiv.innerHTML = videos.map(video => `
                     <div class='video-card' style='margin: 16px 0; display: flex; align-items: center; gap: 1rem; cursor: pointer;'>
-                        <img class='video-thumb' src='${video.miniatura_src || ''}' alt='Miniatura' style='width:160px;height:90px;object-fit:cover;border-radius:8px;'/>
-                        <span style='font-size:1.1rem;color:#fff;'>${video.titulo || 'Sin título'}</span>
+                        <img class='video-thumb' src='${video.miniatura_src || ''}' alt='Miniatura' style='width:160px;height:90px;object-fit:cover;border-radius:8px;' onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjM0YzRjNGIi8+CjxwYXRoIGQ9Ik0xMzUgNzBMMTc1IDkwTDEzNSAxMTBWNzBaIiBmaWxsPSIjN0Y3RjdGIi8+Cjwvc3ZnPg=='"/>
+                        <div style='flex: 1;'>
+                            <div style='font-size:1.1rem;color:#fff;margin-bottom:4px;font-weight:600;'>${video.titulo || 'Sin título'}</div>
+                            <div style='font-size:0.9rem;color:#aaa;margin-bottom:4px;'>${video.descripcion || video.Descripcion || 'Sin descripción'}</div>
+                            <div style='font-size:0.85rem;color:#aaa;display:flex;gap:16px;'>
+                                <span>👁️ ${video.vistas || 0} vistas</span>
+                                <span>🎬 ${canal.nickname}</span>
+                            </div>
+                        </div>
                     </div>
                 `).join('');
                 Array.from(videosDiv.querySelectorAll('.video-card')).forEach((card, i) => {
@@ -97,31 +104,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
             } else {
-                videosDiv.innerHTML = `<div style='color:#fff;'>${canal.nickname} no tiene videos.</div>`;
+                videosDiv.innerHTML = `<div style='color:#fff;text-align:center;padding:2rem;'>${canal.nickname} no tiene videos.</div>`;
             }
             canalesContent.appendChild(videosDiv);
         } catch (e) {
             const videosDiv = document.createElement('div');
             videosDiv.className = 'videos-canal-columna';
-            videosDiv.innerHTML = `<div style='color:#fff;'>No se pudieron cargar los videos.</div>`;
+            videosDiv.innerHTML = `<div style='color:#fff;text-align:center;padding:2rem;'>No se pudieron cargar los videos.</div>`;
             canalesContent.appendChild(videosDiv);
         }
     }
 
-    // --- Modal igual que en videos que me gustan (con scroll y acciones) ---
+    // --- Modal igual que en principal.js (con todas las funciones completas) ---
     async function incrementarVistas(videoId) {
         try {
             await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/incrementar-vistas/${videoId}`, { method: 'POST' });
-        } catch {}
+        } catch (error) {
+            console.error('Error al incrementar vistas:', error);
+        }
     }
 
-    // Modal de video (reutiliza lógica de principal.js simplificada)
+    // Modal de video completo (copiado de principal.js)
     function mostrarModalVideo(url, titulo, videoData, canal) {
+        const datosUsuario = obtenerDatosUsuario();
+        
         const overlay = document.createElement('div');
         overlay.className = 'video-modal-overlay';
         overlay.innerHTML = `
             <div class="video-modal-container">
                 <div class="video-modal-content">
+                    <!-- Sección principal del video -->
                     <div class="video-main-section">
                         <div class="video-player-container">
                             <video src="${url}" controls autoplay class="video-player">
@@ -133,12 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </svg>
                             </button>
                         </div>
+                        
+                        <!-- Información del video -->
                         <div class="video-info-section">
                             <h1 class="video-title-modal">${titulo}</h1>
+                            
+                            <!-- Estadísticas y acciones -->
                             <div class="video-stats-actions">
                                 <div class="video-stats">
                                     <span class="views-count">${videoData.vistas || 0} visualizaciones</span>
                                 </div>
+                                
                                 <div class="video-actions">
                                     <button class="action-btn like-btn" data-video-id="${videoData.id}" data-action="like">
                                         <svg viewBox="0 0 24 24" width="20" height="20">
@@ -146,16 +163,31 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </svg>
                                         <span class="like-count">0</span>
                                     </button>
+                                    
+                                    <button class="action-btn dislike-btn" data-video-id="${videoData.id}" data-action="dislike">
+                                        <svg viewBox="0 0 24 24" width="20" height="20">
+                                            <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/>
+                                        </svg>
+                                        <span class="dislike-count">0</span>
+                                    </button>
                                 </div>
                             </div>
+                            
+                            <!-- Información del canal -->
                             <div class="channel-info">
                                 <div class="channel-avatar">
-                                    <span class="avatar-icon">${canal.nickname.charAt(0).toUpperCase()}</span>
+                                    <span class="avatar-icon">${canal.nickname ? canal.nickname.charAt(0).toUpperCase() : 'U'}</span>
                                 </div>
                                 <div class="channel-details">
-                                    <div class="channel-name">${canal.nickname}</div>
+                                    <div class="channel-name">${canal.nickname || 'Usuario desconocido'}</div>
+                                    <div class="subscriber-count" id="subscriberCount">Cargando suscriptores...</div>
                                 </div>
+                                <button class="subscribe-btn" data-user-id="${canal.id || ''}" id="subscribeBtn">
+                                    <span class="subscribe-text">SUSCRIBIRSE</span>
+                                </button>
                             </div>
+                            
+                            <!-- Descripción del video -->
                             <div class="video-description">
                                 <div class="description-content">
                                     <p>${videoData.Descripcion || videoData.descripcion || 'Sin descripción'}</p>
@@ -163,32 +195,148 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Sección de comentarios -->
                     <div class="comments-section">
                         <div class="comments-header">
                             <h3>Comentarios</h3>
                             <span class="comments-count" id="commentsCount">0</span>
                         </div>
+                        
+                        <!-- Formulario para agregar comentario -->
                         <div class="add-comment-section">
                             <div class="comment-avatar">
-                                <span class="avatar-icon">U</span>
+                                <span class="avatar-icon">${datosUsuario.nickname ? datosUsuario.nickname.charAt(0).toUpperCase() : 'U'}</span>
                             </div>
                             <div class="comment-input-container">
-                                <textarea class="comment-input" placeholder="Agrega un comentario..." id="newCommentText"></textarea>
+                                <textarea 
+                                    class="comment-input" 
+                                    placeholder="Agrega un comentario..." 
+                                    id="newCommentText"
+                                ></textarea>
                                 <div class="comment-actions">
                                     <button class="comment-cancel-btn">CANCELAR</button>
                                     <button class="comment-submit-btn" id="submitComment" data-video-id="${videoData.id}">COMENTAR</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="comments-list" id="commentsList"></div>
+                        
+                        <!-- Lista de comentarios -->
+                        <div class="comments-list" id="commentsList">
+                            <!-- Los comentarios se cargarán aquí dinámicamente -->
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+        
         document.body.appendChild(overlay);
+        
+        // Configurar event listeners
+        setupModalEventListeners(overlay, videoData, canal);
+        
+        // Cargar datos iniciales
+        cargarLikesYDislikes(videoData.id);
+        cargarComentarios(videoData.id);
+        cargarContadorSuscriptores(canal.id);
+        verificarEstadoSuscripcion(canal.id);
+    }
+
+    // Configurar todos los event listeners del modal
+    function setupModalEventListeners(overlay, videoData, canal) {
+        // Cerrar modal
         overlay.querySelector('#cerrarModalVideo').onclick = () => overlay.remove();
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-        // Comentarios y likes (puedes reutilizar funciones de principal.js si lo deseas)
+        
+        // Cerrar con click fuera del contenido
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+            }
+        });
+        
+        // Cerrar con Escape
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                overlay.remove();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+        
+        // Like/Dislike buttons
+        overlay.querySelector('.like-btn').addEventListener('click', (e) => {
+            darLikeDislike(videoData.id, true);
+        });
+        
+        overlay.querySelector('.dislike-btn').addEventListener('click', (e) => {
+            darLikeDislike(videoData.id, false);
+        });
+        
+        // Subscribe button
+        overlay.querySelector('#subscribeBtn').addEventListener('click', (e) => {
+            const usuarioId = e.target.dataset.userId;
+            if (usuarioId) {
+                manejarSuscripcion(usuarioId);
+            }
+        });
+        
+        // Submit comment
+        overlay.querySelector('#submitComment').addEventListener('click', (e) => {
+            enviarComentario(videoData.id);
+        });
+        
+        // Cancel comment
+        overlay.querySelector('.comment-cancel-btn').addEventListener('click', () => {
+            overlay.querySelector('#newCommentText').value = '';
+            overlay.querySelector('#newCommentText').blur();
+        });
+        
+        // Auto-resize textarea
+        const textarea = overlay.querySelector('#newCommentText');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+        
+        // Mostrar/ocultar acciones de comentario
+        textarea.addEventListener('focus', function() {
+            overlay.querySelector('.comment-actions').style.opacity = '1';
+        });
+        
+        textarea.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                overlay.querySelector('.comment-actions').style.opacity = '0';
+            }
+        });
+    }
+
+    // Función para obtener datos del usuario desde localStorage
+    function obtenerDatosUsuario() {
+        try {
+            const usuarioData = localStorage.getItem('usuario');
+            if (usuarioData) {
+                const usuario = JSON.parse(usuarioData);
+                return {
+                    nickname: usuario.nickname || '',
+                    id: usuario.id || '',
+                    token: localStorage.getItem('token') || ''
+                };
+            }
+            
+            // Fallback para compatibilidad con versiones anteriores
+            return {
+                nickname: localStorage.getItem('nickname') || '',
+                id: localStorage.getItem('userId') || '',
+                token: localStorage.getItem('token') || ''
+            };
+        } catch (error) {
+            console.error('Error al obtener datos del usuario:', error);
+            return {
+                nickname: '',
+                id: '',
+                token: ''
+            };
+        }
     }
 
     function obtenerUsuarioIdActual() {
@@ -204,5 +352,329 @@ document.addEventListener('DOMContentLoaded', () => {
         return localStorage.getItem('userId');
     }
 
+    // Función para cargar el contador de suscriptores
+    async function cargarContadorSuscriptores(usuarioId) {
+        try {
+            if (!usuarioId) return;
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioId}/suscriptores/count`);
+            if (response.ok) {
+                const count = await response.text();
+                const subscriberCountEl = document.getElementById('subscriberCount');
+                if (subscriberCountEl) {
+                    const numSuscriptores = parseInt(count);
+                    subscriberCountEl.textContent = `${numSuscriptores} ${numSuscriptores === 1 ? 'suscriptor' : 'suscriptores'}`;
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar contador de suscriptores:', error);
+            const subscriberCountEl = document.getElementById('subscriberCount');
+            if (subscriberCountEl) {
+                subscriberCountEl.textContent = '0 suscriptores';
+            }
+        }
+    }
+
+    // Función para manejar suscripción/desuscripción
+    async function manejarSuscripcion(usuarioSuscritoId) {
+        try {
+            const usuarioSuscriptorId = obtenerUsuarioIdActual();
+            if (!usuarioSuscriptorId) {
+                alert('Debes iniciar sesión para suscribirte');
+                return;
+            }
+            
+            if (usuarioSuscriptorId === usuarioSuscritoId) {
+                alert('No puedes suscribirte a ti mismo');
+                return;
+            }
+            
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const subscribeText = subscribeBtn.querySelector('.subscribe-text');
+            const isSubscribed = subscribeBtn.classList.contains('subscribed');
+            
+            if (isSubscribed) {
+                // Desuscribirse
+                const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/desuscribirse/${usuarioSuscritoId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    subscribeBtn.classList.remove('subscribed');
+                    subscribeText.textContent = 'SUSCRIBIRSE';
+                    subscribeBtn.disabled = false;
+                    
+                    // Actualizar contador
+                    cargarContadorSuscriptores(usuarioSuscritoId);
+                } else {
+                    const errorText = await response.text();
+                    alert('Error al desuscribirse: ' + errorText);
+                }
+            } else {
+                // Suscribirse
+                const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/suscribirse/${usuarioSuscritoId}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    subscribeBtn.classList.add('subscribed');
+                    subscribeText.textContent = 'DESUSCRIBIRSE';
+                    subscribeBtn.disabled = false;
+                    
+                    // Actualizar contador
+                    cargarContadorSuscriptores(usuarioSuscritoId);
+                } else {
+                    const errorText = await response.text();
+                    alert('Error al suscribirse: ' + errorText);
+                }
+            }
+        } catch (error) {
+            console.error('Error al manejar suscripción:', error);
+            alert('Error al procesar la suscripción');
+        }
+    }
+
+    // Función para verificar estado de suscripción
+    async function verificarEstadoSuscripcion(usuarioSuscritoId) {
+        try {
+            const usuarioSuscriptorId = obtenerUsuarioIdActual();
+            if (!usuarioSuscriptorId || !usuarioSuscritoId) return;
+            
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const subscribeText = subscribeBtn.querySelector('.subscribe-text');
+            
+            if (usuarioSuscriptorId === usuarioSuscritoId) {
+                // Si es el propio usuario, ocultar el botón de suscripción
+                if (subscribeBtn) {
+                    subscribeBtn.style.display = 'none';
+                }
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/esta-suscrito/${usuarioSuscritoId}`);
+            if (response.ok) {
+                const estaSuscrito = await response.json();
+                
+                if (estaSuscrito) {
+                    subscribeBtn.classList.add('subscribed');
+                    subscribeText.textContent = 'DESUSCRIBIRSE';
+                } else {
+                    subscribeBtn.classList.remove('subscribed');
+                    subscribeText.textContent = 'SUSCRIBIRSE';
+                }
+                subscribeBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error al verificar suscripción:', error);
+        }
+    }
+
+    // Función para dar like/dislike
+    async function darLikeDislike(videoId, isLike) {
+        try {
+            const usuarioId = obtenerUsuarioIdActual();
+            if (!usuarioId) {
+                alert('Debes iniciar sesión para dar like/dislike');
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/like/dar/${videoId}/${usuarioId}/${isLike}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                cargarLikesYDislikes(videoId);
+            }
+        } catch (error) {
+            console.error('Error al dar like/dislike:', error);
+        }
+    }
+
+    // Función para cargar likes y dislikes
+    async function cargarLikesYDislikes(videoId) {
+        try {
+            const [likesResponse, dislikesResponse] = await Promise.all([
+                fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/like/contar/likes/${videoId}`),
+                fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/like/contar/dislikes/${videoId}`)
+            ]);
+            
+            const likes = await likesResponse.text();
+            const dislikes = await dislikesResponse.text();
+            
+            const likeCountEl = document.querySelector('.like-count');
+            const dislikeCountEl = document.querySelector('.dislike-count');
+            
+            if (likeCountEl) likeCountEl.textContent = likes;
+            if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
+        } catch (error) {
+            console.error('Error al cargar likes/dislikes:', error);
+        }
+    }
+
+    // Función para cargar comentarios
+    async function cargarComentarios(videoId) {
+        try {
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/video/${videoId}`);
+            const comentarios = await response.json();
+            
+            const commentsList = document.getElementById('commentsList');
+            const commentsCount = document.getElementById('commentsCount');
+            const usuarioActualId = obtenerUsuarioIdActual();
+            
+            if (commentsCount) commentsCount.textContent = comentarios.length;
+            
+            if (commentsList) {
+                commentsList.innerHTML = comentarios.map(comentario => `
+                    <div class="comment-item" data-comment-id="${comentario.id}">
+                        <div class="comment-avatar">
+                            <span class="avatar-icon">${comentario.usuario?.nickname?.charAt(0).toUpperCase() || 'U'}</span>
+                        </div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">${comentario.usuario?.nickname || 'Usuario'}</span>
+                                <span class="comment-date">${formatearFecha(comentario.fechaDeCreacion)}</span>
+                                ${comentario.usuario?.id == usuarioActualId ? `
+                                    <button class="delete-comment-btn" data-comment-id="${comentario.id}" title="Eliminar comentario">
+                                        <svg viewBox="0 0 24 24" width="16" height="16">
+                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <div class="comment-text">${comentario.comentario}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Agregar event listeners a los botones de eliminar
+                const deleteButtons = commentsList.querySelectorAll('.delete-comment-btn');
+                deleteButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const comentarioId = btn.dataset.commentId;
+                        eliminarComentario(comentarioId, videoId);
+                    });
+                });
+            }
+        } catch (error) {
+            console.error('Error al cargar comentarios:', error);
+        }
+    }
+
+    // Función para eliminar comentario
+    async function eliminarComentario(comentarioId, videoId) {
+        try {
+            const usuarioId = obtenerUsuarioIdActual();
+            if (!usuarioId) {
+                alert('Debes iniciar sesión para eliminar comentarios');
+                return;
+            }
+            
+            // Confirmar eliminación
+            if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/${comentarioId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                // Recargar comentarios después de eliminar
+                cargarComentarios(videoId);
+            } else {
+                const errorText = await response.text();
+                alert('Error al eliminar comentario: ' + errorText);
+            }
+        } catch (error) {
+            console.error('Error al eliminar comentario:', error);
+            alert('Error al eliminar comentario');
+        }
+    }
+
+    // Función para enviar comentario
+    async function enviarComentario(videoId) {
+        try {
+            const usuarioId = obtenerUsuarioIdActual();
+            if (!usuarioId) {
+                alert('Debes iniciar sesión para comentar');
+                return;
+            }
+            
+            const comentarioTexto = document.getElementById('newCommentText').value.trim();
+            if (!comentarioTexto) {
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/crear/${videoId}/${usuarioId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(comentarioTexto)
+            });
+            
+            if (response.ok) {
+                document.getElementById('newCommentText').value = '';
+                document.querySelector('.comment-actions').style.opacity = '0';
+                cargarComentarios(videoId);
+            }
+        } catch (error) {
+            console.error('Error al enviar comentario:', error);
+        }
+    }
+
+    // Función para formatear fecha
+    function formatearFecha(fechaString) {
+        try {
+            // Crear objeto Date desde el string
+            const fecha = new Date(fechaString);
+            const ahora = new Date();
+            
+            // Verificar que la fecha sea válida
+            if (isNaN(fecha.getTime())) {
+                return 'Fecha inválida';
+            }
+            
+            // Calcular diferencia en milisegundos
+            const diferencia = ahora.getTime() - fecha.getTime();
+            
+            // Si la diferencia es negativa, la fecha es en el futuro
+            if (diferencia < 0) {
+                return 'Justo ahora';
+            }
+            
+            // Convertir a diferentes unidades
+            const segundos = Math.floor(diferencia / 1000);
+            const minutos = Math.floor(segundos / 60);
+            const horas = Math.floor(minutos / 60);
+            const dias = Math.floor(horas / 24);
+            const semanas = Math.floor(dias / 7);
+            const meses = Math.floor(dias / 30);
+            const años = Math.floor(dias / 365);
+            
+            // Retornar el formato apropiado
+            if (segundos < 60) {
+                return 'Justo ahora';
+            } else if (minutos < 60) {
+                return `hace ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+            } else if (horas < 24) {
+                return `hace ${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+            } else if (dias < 7) {
+                return `hace ${dias} ${dias === 1 ? 'día' : 'días'}`;
+            } else if (semanas < 4) {
+                return `hace ${semanas} ${semanas === 1 ? 'semana' : 'semanas'}`;
+            } else if (meses < 12) {
+                return `hace ${meses} ${meses === 1 ? 'mes' : 'meses'}`;
+            } else {
+                return `hace ${años} ${años === 1 ? 'año' : 'años'}`;
+            }
+        } catch (error) {
+            console.error('Error al formatear fecha:', error);
+            return 'Fecha inválida';
+        }
+    }
+
+    // Inicializar la carga de canales seguidos
     cargarCanalesSeguidos();
 });

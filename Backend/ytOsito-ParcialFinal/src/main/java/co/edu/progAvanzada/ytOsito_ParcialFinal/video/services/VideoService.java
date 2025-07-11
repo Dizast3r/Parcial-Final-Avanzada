@@ -159,4 +159,18 @@ public class VideoService {
     public List<Video> buscarVideosPorTitulo(String titulo) {
         return videoRepository.findByTituloContainingIgnoreCase(titulo);
     }
+    
+    /**
+     * Obtiene todos los videos de un usuario específico.
+     * 
+     * @param usuarioId el ID del usuario del cual se quieren obtener los videos
+     * @return una lista de videos del usuario
+     * @throws EntityNotFoundException si no se encuentra el usuario con el ID especificado
+     */
+    public List<Video> obtenerVideosPorUsuario(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new EntityNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        return videoRepository.findByUsuarioId(usuarioId);
+    }
 }

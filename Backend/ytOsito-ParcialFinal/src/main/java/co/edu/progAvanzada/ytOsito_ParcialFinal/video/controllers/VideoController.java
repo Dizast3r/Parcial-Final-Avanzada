@@ -130,4 +130,15 @@ public class VideoController {
     public List<Video> buscarVideosPorTitulo(@RequestParam String titulo) {
         return videoService.buscarVideosPorTitulo(titulo);
     }
+    
+    /**
+     * Obtiene todos los videos de un usuario específico.
+     * 
+     * @param usuarioId el ID del usuario del cual se quieren obtener los videos
+     * @return una lista de videos del usuario
+     */
+    @GetMapping("/usuario/{usuarioId}")
+    public List<Video> obtenerVideosPorUsuario(@PathVariable Long usuarioId) {
+        return videoService.obtenerVideosPorUsuario(usuarioId);
+    }
 }
