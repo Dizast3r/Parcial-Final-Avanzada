@@ -168,4 +168,16 @@ public class UsuarioController {
     public long contarSuscriptores(@Valid @PathVariable Long usuarioId) {
         return usuarioService.contarSuscriptores(usuarioId);
     }
+    
+    /**
+     * Obtiene la lista de videos que le gustan a un usuario.
+     * 
+     * @param usuarioId ID del usuario del que se quieren obtener los videos que le gustan
+     * @return Lista de videos que le gustan al usuario
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    @GetMapping("/{usuarioId}/videos-que-me-gustan")
+    public List<Video> obtenerVideosQueMeGustan(@Valid @PathVariable Long usuarioId) {
+        return usuarioService.obtenerVideosQueMeGustan(usuarioId);
+    }
 }

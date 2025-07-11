@@ -3,6 +3,7 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.services;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.notification.service.EmailService;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.repositories.UsuarioRepository;
+import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -233,5 +234,19 @@ public class UsuarioService {
      */
     public boolean estaSuscrito(Long suscriptorId, Long suscritoId) {
         return usuarioRepository.existsSuscripcion(suscriptorId, suscritoId);
+    }
+    
+    /**
+     * Obtiene la lista de videos que le gustan a un usuario.
+     * 
+     * @param usuarioId ID del usuario del que se quieren obtener los videos que le gustan
+     * @return Lista de videos que le gustan al usuario
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    public List<Video> obtenerVideosQueMeGustan(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new EntityNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        return usuarioRepository.findVideosQueMeGustan(usuarioId);
     }
 }
