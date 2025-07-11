@@ -1,3 +1,7 @@
+/**
+ * Funcionalidad principal de la aplicación de videos
+ * @authors Jorge Miguel Méndez Barón, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const barralateral = document.getElementById('barralateral');
     const overlay = document.getElementById('overlay');
@@ -82,6 +86,13 @@ function inicializarBusqueda() {
 }
 
 // Función para buscar videos
+/**
+ * Busca videos por título usando el endpoint de la API.
+ * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ * @async
+ * @param {string} termino - Término de búsqueda
+ * @returns {Promise<void>}
+ */
 async function buscarVideos(termino) {
     try {
         // Mostrar indicador de carga
@@ -339,6 +350,13 @@ function resaltarTermino(texto, termino) {
 }
 
 // Función para obtener sugerencias de búsqueda (opcional)
+/**
+ * Obtiene sugerencias de búsqueda locales a partir de los videos cargados.
+ * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ * @async
+ * @param {string} termino - Término de búsqueda
+ * @returns {Promise<Array>} Sugerencias de videos
+ */
 async function obtenerSugerencias(termino) {
     try {
         // Filtrar videos locales para sugerencias rápidas
@@ -404,23 +422,20 @@ async function obtenerSugerencias(termino) {
                 const usuario = JSON.parse(usuarioData);
                 return {
                     nickname: usuario.nickname || '',
-                    id: usuario.id || '',
-                    token: localStorage.getItem('token') || ''
+                    id: usuario.id || ''
                 };
             }
             
             // Fallback para compatibilidad con versiones anteriores
             return {
                 nickname: localStorage.getItem('nickname') || '',
-                id: localStorage.getItem('userId') || '',
-                token: localStorage.getItem('token') || ''
+                id: localStorage.getItem('userId') || ''
             };
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
             return {
                 nickname: '',
-                id: '',
-                token: ''
+                id: ''
             };
         }
     }
@@ -457,6 +472,12 @@ async function obtenerSugerencias(termino) {
     }
 
     // Cargar todos los videos publicados usando el endpoint correcto /video/todos
+    /**
+     * Carga todos los videos publicados usando el endpoint /video/todos.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @returns {Promise<void>}
+     */
     async function cargarVideos() {
         try {
             const response = await fetch('https://parcial-final-avanzada-production-cdde.up.railway.app/video/todos');
@@ -515,6 +536,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para incrementar vistas
+    /**
+     * Incrementa el contador de vistas de un video.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} videoId - ID del video
+     * @returns {Promise<void>}
+     */
     async function incrementarVistas(videoId) {
         try {
             await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/incrementar-vistas/${videoId}`, {
@@ -712,6 +740,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para cargar el contador de suscriptores
+    /**
+     * Carga el contador de suscriptores de un usuario.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} usuarioId - ID del usuario
+     * @returns {Promise<void>}
+     */
     async function cargarContadorSuscriptores(usuarioId) {
         try {
             if (!usuarioId) return;
@@ -735,6 +770,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para manejar suscripción/desuscripción
+    /**
+     * Maneja la suscripción o desuscripción a un usuario.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} usuarioSuscritoId - ID del usuario a suscribirse/desuscribirse
+     * @returns {Promise<void>}
+     */
     async function manejarSuscripcion(usuarioSuscritoId) {
         try {
             const usuarioSuscriptorId = obtenerUsuarioIdActual();
@@ -794,6 +836,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para verificar estado de suscripción
+    /**
+     * Verifica si el usuario actual está suscrito a otro usuario.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} usuarioSuscritoId - ID del usuario a verificar
+     * @returns {Promise<void>}
+     */
     async function verificarEstadoSuscripcion(usuarioSuscritoId) {
         try {
             const usuarioSuscriptorId = obtenerUsuarioIdActual();
@@ -829,6 +878,14 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para dar like/dislike
+    /**
+     * Envía una petición para dar like o dislike a un video.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} videoId - ID del video
+     * @param {boolean} isLike - true para like, false para dislike
+     * @returns {Promise<void>}
+     */
     async function darLikeDislike(videoId, isLike) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
@@ -850,6 +907,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para cargar likes y dislikes
+    /**
+     * Carga la cantidad de likes y dislikes de un video.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} videoId - ID del video
+     * @returns {Promise<void>}
+     */
     async function cargarLikesYDislikes(videoId) {
         try {
             const [likesResponse, dislikesResponse] = await Promise.all([
@@ -871,6 +935,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para cargar comentarios
+    /**
+     * Carga los comentarios de un video y los muestra en el modal.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} videoId - ID del video
+     * @returns {Promise<void>}
+     */
     async function cargarComentarios(videoId) {
         try {
             const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/video/${videoId}`);
@@ -921,6 +992,14 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para eliminar comentario
+    /**
+     * Elimina un comentario de un video.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} comentarioId - ID del comentario
+     * @param {string|number} videoId - ID del video
+     * @returns {Promise<void>}
+     */
     async function eliminarComentario(comentarioId, videoId) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
@@ -952,6 +1031,13 @@ async function obtenerSugerencias(termino) {
     }
 
     // Función para enviar comentario
+    /**
+     * Envía un comentario para un video.
+     * @author Jorge Miguel Mendez Baron, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+     * @async
+     * @param {string|number} videoId - ID del video
+     * @returns {Promise<void>}
+     */
     async function enviarComentario(videoId) {
         try {
             const usuarioId = obtenerUsuarioIdActual();

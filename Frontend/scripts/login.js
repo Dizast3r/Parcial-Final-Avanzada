@@ -1,3 +1,8 @@
+/**
+ * Manejo del formulario de inicio de sesión
+ * @authors Jorge Miguel Méndez Barón, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('login-form');
     const errorMsg = document.getElementById('error-msg');
@@ -8,13 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const nickname = document.getElementById('nickname').value.trim();
         const password = document.getElementById('password').value;
 
+        /**
+         * Realiza el proceso de autenticación del usuario
+         * @async
+         * @function authenticateUser
+         * @param {string} nickname - Nombre de usuario
+         * @param {string} password - Contraseña del usuario
+         * @throws {Error} Error al iniciar sesión o credenciales inválidas
+         * @returns {Promise<void>} Redirige al usuario a la página principal si es exitoso
+         */
         try {
             const response = await fetch('https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({nickname, password}) // Enviamos como 'nickname' al backend
+                body: JSON.stringify({nickname, password})
             });
 
             if (!response.ok) {

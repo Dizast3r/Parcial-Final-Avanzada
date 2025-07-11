@@ -1,3 +1,8 @@
+/**
+ * Funcionalidad para mostrar los suscriptores del canal del usuario
+ * @authors Jorge Miguel Méndez Barón, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Menú hamburguesa y dropdown ---
     const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -18,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'principal.html';
     });
     cerrarSesion.addEventListener('click', () => {
-        localStorage.removeItem('token');
         localStorage.removeItem('nickname');
         localStorage.removeItem('userId');
         localStorage.removeItem('usuario');
@@ -30,6 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const suscriptoresGrid = document.getElementById('suscriptoresGrid');
     const usuarioId = obtenerUsuarioIdActual();
 
+    /**
+     * Carga la lista de suscriptores del usuario actual
+     * @async
+     * @function cargarSuscriptores
+     * @throws {Error} Error al cargar suscriptores desde el servidor
+     * @returns {Promise<void>} Renderiza los suscriptores en la interfaz
+     */
     async function cargarSuscriptores() {
         try {
             const res = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioId}/suscriptores`);

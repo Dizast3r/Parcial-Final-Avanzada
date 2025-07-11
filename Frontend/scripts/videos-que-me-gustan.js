@@ -1,3 +1,12 @@
+/**
+ * Script para gestionar la página de videos que me gustan
+ * 
+ * @authors Jorge Miguel Méndez Barón, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ * @version 1.0
+ * @description Maneja la funcionalidad de videos favoritos, incluyendo carga de videos,
+ * interacciones (likes, comentarios, suscripciones) y modal de reproducción
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Menú hamburguesa y dropdown ---
     const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -21,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     cerrarSesion.addEventListener('click', () => {
-        localStorage.removeItem('token');
         localStorage.removeItem('nickname');
         localStorage.removeItem('userId');
         localStorage.removeItem('usuario');
@@ -37,18 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const usuario = JSON.parse(usuarioData);
                 return {
                     nickname: usuario.nickname || '',
-                    id: usuario.id || '',
-                    token: localStorage.getItem('token') || ''
+                    id: usuario.id || ''
                 };
             }
             return {
                 nickname: localStorage.getItem('nickname') || '',
-                id: localStorage.getItem('userId') || '',
-                token: localStorage.getItem('token') || ''
+                id: localStorage.getItem('userId') || ''
             };
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
-            return { nickname: '', id: '', token: '' };
+            return { nickname: '', id: '' };
         }
     }
 
@@ -61,6 +67,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const videosGrid = document.getElementById('videosGrid');
     const usuarioId = obtenerUsuarioIdActual();
 
+    /**
+     * Carga los videos que le gustan al usuario actual desde el servidor
+     * 
+     * @async
+     * @function cargarVideosQueMeGustan
+     * @description Obtiene la lista de videos marcados como favoritos por el usuario
+     * y los renderiza en la grilla. Maneja errores de conexión y estados vacíos.
+     * @throws {Error} Error de conexión al servidor o respuesta inválida
+     * @returns {Promise<void>} Promise que se resuelve cuando los videos se han cargado
+     */
     async function cargarVideosQueMeGustan() {
         try {
             console.log('Cargando videos que me gustan para usuario:', usuarioId);
@@ -174,7 +190,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Función para incrementar vistas
+    /**
+     * Incrementa el contador de vistas de un video específico
+     * 
+     * @async
+     * @function incrementarVistas
+     * @param {string|number} videoId - ID único del video
+     * @description Envía una petición POST al servidor para incrementar el contador
+     * de visualizaciones del video especificado
+     * @throws {Error} Error de conexión al servidor
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha incrementado la vista
+     */
     async function incrementarVistas(videoId) {
         try {
             await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/incrementar-vistas/${videoId}`, {
@@ -323,7 +349,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Funciones de likes ---
+    /**
+     * Registra un like o dislike en un video específico
+     * 
+     * @async
+     * @function darLikeDislike
+     * @param {string|number} videoId - ID único del video
+     * @param {boolean} isLike - true para like, false para dislike
+     * @description Envía la acción de like/dislike al servidor y actualiza los contadores.
+     * Si se da dislike, recarga la lista de videos favoritos después de un segundo.
+     * @throws {Error} Error de conexión al servidor
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha procesado la acción
+     */
     async function darLikeDislike(videoId, isLike) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
@@ -349,6 +386,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Carga los contadores de likes y dislikes para un video específico
+     * 
+     * @async
+     * @function cargarLikesYDislikes
+     * @param {string|number} videoId - ID único del video
+     * @description Obtiene del servidor los contadores actuales de likes y dislikes
+     * y actualiza la interfaz de usuario con estos valores
+     * @throws {Error} Error de conexión al servidor
+     * @returns {Promise<void>} Promise que se resuelve cuando se han cargado los contadores
+     */
     async function cargarLikesYDislikes(videoId) {
         try {
             const [likesResponse, dislikesResponse] = await Promise.all([
@@ -369,7 +417,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Funciones de suscripción ---
+    /**
+     * Carga el número de suscriptores de un usuario específico
+     * 
+     * @async
+     * @function cargarContadorSuscriptores
+     * @param {string|number} usuarioId - ID único del usuario
+     * @description Obtiene del servidor el número total de suscriptores del usuario
+     * y actualiza la interfaz con el formato adecuado (singular/plural)
+     * @throws {Error} Error de conexión al servidor
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha cargado el contador
+     */
     async function cargarContadorSuscriptores(usuarioId) {
         try {
             if (!usuarioId) return;
@@ -389,6 +447,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Maneja la suscripción/desuscripción a un usuario específico
+     * 
+     * @async
+     * @function manejarSuscripcion
+     * @param {string|number} usuarioSuscritoId - ID del usuario al que se quiere suscribir/desuscribir
+     * @description Procesa la acción de suscripción o desuscripción según el estado actual.
+     * Actualiza la interfaz del botón y el contador de suscriptores.
+     * @throws {Error} Error de conexión al servidor o procesamiento
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha procesado la suscripción
+     */
     async function manejarSuscripcion(usuarioSuscritoId) {
         try {
             const usuarioSuscriptorId = obtenerUsuarioIdActual();
@@ -439,6 +508,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Verifica el estado actual de suscripción del usuario a un canal específico
+     * 
+     * @async
+     * @function verificarEstadoSuscripcion
+     * @param {string|number} usuarioSuscritoId - ID del usuario/canal a verificar
+     * @description Consulta el servidor para determinar si el usuario actual está suscrito
+     * al canal especificado y actualiza el estado visual del botón de suscripción
+     * @throws {Error} Error de conexión al servidor
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha verificado el estado
+     */
     async function verificarEstadoSuscripcion(usuarioSuscritoId) {
         try {
             const usuarioSuscriptorId = obtenerUsuarioIdActual();
@@ -469,7 +549,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Funciones de comentarios ---
+    /**
+     * Carga todos los comentarios de un video específico
+     * 
+     * @async
+     * @function cargarComentarios
+     * @param {string|number} videoId - ID único del video
+     * @description Obtiene del servidor todos los comentarios del video y los renderiza
+     * en la sección de comentarios. Incluye funcionalidad para eliminar comentarios propios.
+     * @throws {Error} Error de conexión al servidor
+     * @returns {Promise<void>} Promise que se resuelve cuando se han cargado los comentarios
+     */
     async function cargarComentarios(videoId) {
         try {
             const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/video/${videoId}`);
@@ -522,6 +612,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Elimina un comentario específico del servidor
+     * 
+     * @async
+     * @function eliminarComentario
+     * @param {string|number} comentarioId - ID único del comentario a eliminar
+     * @param {string|number} videoId - ID del video al que pertenece el comentario
+     * @description Elimina un comentario del servidor previa confirmación del usuario.
+     * Recarga la lista de comentarios después de una eliminación exitosa.
+     * @throws {Error} Error de conexión al servidor o eliminación
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha eliminado el comentario
+     */
     async function eliminarComentario(comentarioId, videoId) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
@@ -549,6 +651,18 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error al eliminar comentario');
         }
     }
+
+     /**
+     * Envía un nuevo comentario al servidor
+     * 
+     * @async
+     * @function enviarComentario
+     * @param {string|number} videoId - ID único del video al que se añade el comentario
+     * @description Toma el texto del textarea de comentarios y lo envía al servidor.
+     * Limpia el formulario y recarga la lista de comentarios tras el envío exitoso.
+     * @throws {Error} Error de conexión al servidor o envío
+     * @returns {Promise<void>} Promise que se resuelve cuando se ha enviado el comentario
+     */
 
     async function enviarComentario(videoId) {
         try {

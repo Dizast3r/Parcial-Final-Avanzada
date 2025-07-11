@@ -1,3 +1,8 @@
+/**
+ * Manejo del formulario de registro de usuarios
+ * @authors Jorge Miguel Méndez Barón, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('register-form');
     const registerMsg = document.getElementById('register-msg');
@@ -12,6 +17,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value.trim();
         const sexo = document.getElementById('sexo').value;
 
+        /**
+         * Registra un nuevo usuario en el sistema
+         * @async
+         * @function registerUser
+         * @param {Object} userData - Datos del usuario a registrar
+         * @param {string} userData.nombre - Nombre completo del usuario
+         * @param {string} userData.nickname - Nombre de usuario único
+         * @param {string} userData.ciudadDeNacimiento - Ciudad de nacimiento
+         * @param {string} userData.password - Contraseña del usuario
+         * @param {string} userData.email - Correo electrónico
+         * @param {string} userData.sexo - Sexo del usuario
+         * @throws {Error} Error al registrar usuario (nickname duplicado, email inválido, etc.)
+         * @returns {Promise<void>} Redirige al login si el registro es exitoso
+         */
         try {
             const response = await fetch('https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/registro', {
                 method: 'POST',

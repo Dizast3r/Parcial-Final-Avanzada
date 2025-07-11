@@ -1,4 +1,8 @@
-// --- Suscripciones: barra de menú, canales y videos ---
+/**
+ * Funcionalidad de suscripciones: gestión de canales seguidos y videos
+ * @authors Jorge Miguel Méndez Barón, Jose David Cucanchon Ramirez, Edgar Julian Roldan Rojas
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Menú hamburguesa y dropdown ---
     const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -19,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'principal.html';
     });
     cerrarSesion.addEventListener('click', () => {
-        localStorage.removeItem('token');
         localStorage.removeItem('nickname');
         localStorage.removeItem('userId');
         localStorage.removeItem('usuario');
@@ -33,12 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let canales = [];
     let usuarioId = obtenerUsuarioIdActual();
 
+    /**
+     * Carga los canales a los que está suscrito el usuario actual
+     * @async
+     * @function cargarCanalesSeguidos
+     * @throws {Error} Error al cargar canales desde el servidor
+     * @returns {Promise<void>} Renderiza los canales seguidos en la interfaz
+     */
     async function cargarCanalesSeguidos() {
         try {
-            // Cambiar endpoint a /usuario/{usuarioId}/suscripciones
             const res = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioId}/suscripciones`);
             canales = await res.json();
-            console.log('Canales seguidos recibidos:', canales); // DEBUG
+            console.log('Canales seguidos recibidos:', canales);
             renderCanalesColumna();
         } catch (e) {
             canalesBar.innerHTML = '<div style="color:#fff;">No se pudieron cargar los canales.</div>';
@@ -65,7 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Mostrar videos debajo de la barra, ocupando todo el ancho
+    /**
+     * Muestra los videos de un canal específico
+     * @async
+     * @function mostrarVideosCanalFila
+     * @param {number} idx - Índice del canal en el array de canales
+     * @param {HTMLElement} canalDiv - Elemento DOM del canal clickeado
+     * @throws {Error} Error al cargar videos del canal
+     * @returns {Promise<void>} Renderiza los videos del canal seleccionado
+     */
     async function mostrarVideosCanalFila(idx, canalDiv) {
         canalesContent.innerHTML = '';
         document.querySelectorAll('.canal-avatar').forEach(el => el.classList.remove('selected'));
@@ -74,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/usuario/${canal.id}`);
             const videos = await res.json();
-            console.log(`Videos recibidos para canal ${canal.nickname} (ID: ${canal.id}):`, videos); // DEBUG
+            console.log(`Videos recibidos para canal ${canal.nickname} (ID: ${canal.id}):`, videos);
             const videosDiv = document.createElement('div');
             videosDiv.className = 'videos-canal-columna';
             if (Array.isArray(videos) && videos.length > 0) {
@@ -115,7 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Modal igual que en principal.js (con todas las funciones completas) ---
+    /**
+     * Incrementa el contador de vistas de un video
+     * @async
+     * @function incrementarVistas
+     * @param {number} videoId - ID del video a incrementar vistas
+     * @returns {Promise<void>} Incrementa las vistas en el servidor
+     */
     async function incrementarVistas(videoId) {
         try {
             await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/incrementar-vistas/${videoId}`, { method: 'POST' });
@@ -318,23 +341,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const usuario = JSON.parse(usuarioData);
                 return {
                     nickname: usuario.nickname || '',
-                    id: usuario.id || '',
-                    token: localStorage.getItem('token') || ''
+                    id: usuario.id || ''
                 };
             }
             
             // Fallback para compatibilidad con versiones anteriores
             return {
                 nickname: localStorage.getItem('nickname') || '',
-                id: localStorage.getItem('userId') || '',
-                token: localStorage.getItem('token') || ''
+                id: localStorage.getItem('userId') || ''
             };
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
             return {
                 nickname: '',
-                id: '',
-                token: ''
+                id: ''
             };
         }
     }
@@ -352,7 +372,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return localStorage.getItem('userId');
     }
 
-    // Función para cargar el contador de suscriptores
+    /**
+     * Carga el contador de suscriptores de un usuario
+     * @async
+     * @function cargarContadorSuscriptores
+     * @param {number} usuarioId - ID del usuario del cual obtener suscriptores
+     * @returns {Promise<void>} Actualiza el contador en la interfaz
+     */
     async function cargarContadorSuscriptores(usuarioId) {
         try {
             if (!usuarioId) return;
@@ -375,7 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para manejar suscripción/desuscripción
+    /**
+     * Maneja la suscripción o desuscripción a un canal
+     * @async
+     * @function manejarSuscripcion
+     * @param {number} usuarioSuscritoId - ID del usuario al cual suscribirse/desuscribirse
+     * @returns {Promise<void>} Actualiza el estado de suscripción en la interfaz
+     */
     async function manejarSuscripcion(usuarioSuscritoId) {
         try {
             const usuarioSuscriptorId = obtenerUsuarioIdActual();
@@ -434,7 +466,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para verificar estado de suscripción
+    /**
+     * Verifica el estado de suscripción actual del usuario
+     * @async
+     * @function verificarEstadoSuscripcion
+     * @param {number} usuarioSuscritoId - ID del usuario para verificar suscripción
+     * @returns {Promise<void>} Actualiza el botón de suscripción según el estado actual
+     */
     async function verificarEstadoSuscripcion(usuarioSuscritoId) {
         try {
             const usuarioSuscriptorId = obtenerUsuarioIdActual();
@@ -469,7 +507,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para dar like/dislike
+    /**
+     * Envía un like o dislike a un video
+     * @async
+     * @function darLikeDislike
+     * @param {number} videoId - ID del video
+     * @param {boolean} isLike - true para like, false para dislike
+     * @returns {Promise<void>} Actualiza los contadores de likes/dislikes
+     */
     async function darLikeDislike(videoId, isLike) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
@@ -490,7 +535,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para cargar likes y dislikes
+    /**
+     * Carga los contadores de likes y dislikes de un video
+     * @async
+     * @function cargarLikesYDislikes
+     * @param {number} videoId - ID del video
+     * @returns {Promise<void>} Actualiza los contadores en la interfaz
+     */
     async function cargarLikesYDislikes(videoId) {
         try {
             const [likesResponse, dislikesResponse] = await Promise.all([
@@ -511,7 +562,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para cargar comentarios
+    /**
+     * Carga los comentarios de un video
+     * @async
+     * @function cargarComentarios
+     * @param {number} videoId - ID del video
+     * @returns {Promise<void>} Renderiza los comentarios en la interfaz
+     */
     async function cargarComentarios(videoId) {
         try {
             const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/video/${videoId}`);
@@ -561,7 +618,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para eliminar comentario
+    /**
+     * Elimina un comentario del video
+     * @async
+     * @function eliminarComentario
+     * @param {number} comentarioId - ID del comentario a eliminar
+     * @param {number} videoId - ID del video para recargar comentarios
+     * @returns {Promise<void>} Elimina el comentario y recarga la lista
+     */
     async function eliminarComentario(comentarioId, videoId) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
@@ -592,7 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para enviar comentario
+    /**
+     * Envía un nuevo comentario a un video
+     * @async
+     * @function enviarComentario
+     * @param {number} videoId - ID del video al cual agregar el comentario
+     * @returns {Promise<void>} Agrega el comentario y recarga la lista
+     */
     async function enviarComentario(videoId) {
         try {
             const usuarioId = obtenerUsuarioIdActual();
