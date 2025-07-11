@@ -2,9 +2,8 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.likes.entities;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,10 +37,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "likes")
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class,
-    property = "id"
-)
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Like {
     
@@ -80,8 +75,10 @@ public class Like {
      * Relación muchos-a-uno con la entidad Video. Un video puede tener
      * múltiples reacciones, pero cada reacción pertenece a un solo video.
      * Se utiliza carga lazy para optimizar el rendimiento.
+     * Se ignora en la serialización JSON para evitar referencias circulares.
      */
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Video video;
     
     /**
@@ -92,6 +89,11 @@ public class Like {
      * Se utiliza carga lazy para optimizar el rendimiento.
      */
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({
+        "videos", "comentarios", "videosLikeados",
+        "suscripciones", "suscriptores",
+        "password", "email", "hibernateLazyInitializer", "handler"
+    })
     private Usuario usuario;
     
     /**

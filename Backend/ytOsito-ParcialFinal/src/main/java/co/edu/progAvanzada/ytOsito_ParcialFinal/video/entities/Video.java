@@ -3,9 +3,7 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.comentario.entities.Comentario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.likes.entities.Like;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,10 +41,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "video")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Video {
 
@@ -94,7 +88,7 @@ public class Video {
     @NotBlank
     @Size(min = 1, max = 400)
     @Column(nullable = false, length = 400)
-    private String Descripcion;
+    private String descripcion;
 
     /**
      * Número de vistas del video.
@@ -120,7 +114,7 @@ public class Video {
     @JsonIgnoreProperties({
         "videos", "comentarios", "videosLikeados",
         "suscripciones", "suscriptores",
-        "password", "email"
+        "password", "email", "hibernateLazyInitializer", "handler"
     })
     private Usuario usuario;
 
@@ -130,6 +124,7 @@ public class Video {
      * Los comentarios se eliminan en cascada cuando se elimina el video.
      */
     @OneToMany(mappedBy = "video", cascade = CascadeType.REMOVE)
+    @JsonIgnoreProperties({"video", "hibernateLazyInitializer", "handler"})
     private List<Comentario> comentarios;
 
     /**
@@ -138,6 +133,7 @@ public class Video {
      * Los likes se eliminan en cascada cuando se elimina el video.
      */
     @OneToMany(mappedBy = "video", cascade = CascadeType.REMOVE)
+    @JsonIgnoreProperties({"video", "hibernateLazyInitializer", "handler"})
     private List<Like> likes;
 
     /**
