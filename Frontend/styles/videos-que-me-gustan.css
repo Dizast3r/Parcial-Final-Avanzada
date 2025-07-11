@@ -1,0 +1,419 @@
+body {
+    background: #111;
+    color: #fff;
+    margin: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #181818;
+    padding: 0.5rem 2rem;
+    height: 56px;
+}
+.logo {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+}
+.hamburger-line {
+    width: 28px;
+    height: 4px;
+    background: #fff;
+    margin: 3px 0;
+    border-radius: 2px;
+}
+.menu-dropdown {
+    position: absolute;
+    top: 56px;
+    right: 2rem;
+    background: #232323;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 100;
+}
+.menu-dropdown.show {
+    display: block;
+}
+.menu-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+}
+.menu-dropdown li {
+    padding: 0.75rem 2rem;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.menu-dropdown li:hover {
+    background: #333;
+}
+.titulo {
+    margin: 2rem 0 1.5rem 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+}
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 0 2rem 2rem 2rem;
+}
+.video-card {
+    background: #181818;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+.video-card:hover {
+    transform: translateY(-4px) scale(1.03);
+}
+.video-thumb {
+    width: 100%;
+    max-width: 280px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: #333;
+}
+.video-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    text-align: center;
+}
+.video-meta {
+    font-size: 0.95rem;
+    color: #bbb;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+/* --- MODAL DE VIDEO --- */
+.video-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+}
+.video-modal-container {
+    background: #181818;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    max-width: 800px;
+    width: 95vw;
+    margin: 2rem 0;
+    padding: 0;
+    overflow: hidden;
+}
+.video-modal-content {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    padding: 0 2rem 2rem 2rem;
+    max-height: 80vh;
+    min-height: 400px;
+    overflow: hidden;
+}
+.video-main-section {
+    flex: 2;
+    min-width: 0;
+    overflow-y: auto;
+    max-height: 78vh;
+    padding-right: 0.5rem;
+}
+.comments-section {
+    flex: 1.2;
+    min-width: 0;
+    background: #181818;
+    border-radius: 12px;
+    margin-left: 0.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    max-height: 78vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.video-player-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.video-player {
+    width: 100%;
+    max-width: 720px;
+    border-radius: 12px;
+    background: #000;
+}
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #232323;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    padding: 4px 8px;
+    z-index: 10;
+    transition: background 0.2s;
+}
+.modal-close-btn:hover {
+    background: #333;
+}
+.video-title-modal {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0.5rem 0 0.5rem 0;
+    color: #fff;
+}
+.video-stats-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+.video-stats {
+    color: #bbb;
+    font-size: 1.1rem;
+}
+.video-actions {
+    display: flex;
+    gap: 1rem;
+}
+.action-btn {
+    background: #232323;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.action-btn:hover {
+    background: #333;
+}
+.like-count, .dislike-count {
+    font-weight: bold;
+}
+.channel-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.channel-avatar {
+    width: 48px;
+    height: 48px;
+    background: #7c3aed;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: bold;
+}
+.channel-details {
+    display: flex;
+    flex-direction: column;
+}
+.channel-name {
+    font-weight: bold;
+    color: #fff;
+}
+.subscriber-count {
+    color: #bbb;
+    font-size: 0.95rem;
+}
+.subscribe-btn {
+    background: #c00;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.subscribe-btn.subscribed {
+    background: #444;
+    color: #fff;
+}
+.subscribe-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.video-description {
+    background: #232323;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: #fff;
+    font-size: 1rem;
+}
+.comments-section {
+    margin-top: 2rem;
+}
+.comments-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+}
+.add-comment-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    background: #7c3aed;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: bold;
+}
+.comment-input-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.comment-input {
+    width: 100%;
+    min-height: 40px;
+    max-height: 120px;
+    border-radius: 8px;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    resize: none;
+    background: #181818;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+.comment-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.comment-cancel-btn, .comment-submit-btn {
+    background: #232323;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.comment-cancel-btn:hover, .comment-submit-btn:hover {
+    background: #333;
+}
+.comments-list {
+    margin-top: 1rem;
+}
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    background: #232323;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+}
+.comment-content {
+    flex: 1;
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: bold;
+}
+.comment-author {
+    color: #7c3aed;
+}
+.comment-date {
+    color: #bbb;
+    font-size: 0.95rem;
+    font-weight: normal;
+}
+.comment-text {
+    color: #fff;
+    font-size: 1rem;
+    margin-top: 0.2rem;
+    word-break: break-word;
+}
+@media (max-width: 700px) {
+    .videos-grid {
+        grid-template-columns: 1fr;
+    }
+    .titulo {
+        margin-left: 1rem;
+    }
+    .navbar {
+        padding: 0.5rem 1rem;
+    }
+}
+@media (max-width: 900px) {
+    .video-modal-container {
+        max-width: 98vw;
+        padding: 0;
+    }
+    .video-modal-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0 0.5rem 1rem 0.5rem;
+        max-height: 98vh;
+    }
+    .video-main-section, .comments-section {
+        max-height: none;
+        padding-right: 0;
+        margin-left: 0;
+    }
+}

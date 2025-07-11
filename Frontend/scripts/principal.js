@@ -143,6 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Redirigir a videos-que-me-gustan.html al hacer clic en "Videos que me gustan"
+    const videosQueMeGustanLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
+        .find(el => el.textContent.trim() === 'Videos que me gustan')?.parentElement;
+    if (videosQueMeGustanLink) {
+        videosQueMeGustanLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'videos-que-me-gustan.html';
+        });
+    }
+
     // Cargar todos los videos publicados usando el endpoint correcto /video/todos
     async function cargarVideos() {
         try {

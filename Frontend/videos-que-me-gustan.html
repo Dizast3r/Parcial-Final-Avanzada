@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos que me gustan</title>
+    <link rel="stylesheet" href="styles/videos-que-me-gustan.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <span class="logo">YouTube Osito</span>
+        </div>
+        <div class="navbar-right">
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Mostrar menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <div id="menuDropdown" class="menu-dropdown">
+                <ul>
+                    <li id="goInicio">Volver a inicio</li>
+                    <li id="cerrarSesion">Cerrar sesión</li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <h1 class="titulo">Videos que me gustan</h1>
+        <div id="videosGrid" class="videos-grid"></div>
+    </main>
+    <script src="scripts/videos-que-me-gustan.js"></script>
+</body>
+</html>
