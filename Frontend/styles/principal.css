@@ -1186,3 +1186,68 @@ body {
     font-size: 14px;
     line-height: 1.4;
 }
+
+/* Botón de eliminar comentario */
+.delete-comment-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+    opacity: 0.7;
+}
+
+.delete-comment-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ff4444;
+    opacity: 1;
+}
+
+.delete-comment-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-comment-btn svg {
+    fill: currentColor;
+    transition: fill 0.2s ease;
+}
+
+/* Ocultar por defecto y mostrar solo al hacer hover en el comentario */
+.comment-item .delete-comment-btn {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.comment-item:hover .delete-comment-btn {
+    opacity: 0.7;
+    visibility: visible;
+}
+
+.comment-item:hover .delete-comment-btn:hover {
+    opacity: 1;
+}
+
+/* Estilo para el header del comentario que contiene el botón */
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.comment-author {
+    font-weight: bold;
+    color: #fff;
+}
+
+.comment-date {
+    color: #aaa;
+    font-size: 0.9em;
+}
