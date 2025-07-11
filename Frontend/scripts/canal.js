@@ -142,21 +142,20 @@ document.addEventListener('DOMContentLoaded', () => {
             mensajeSubida.textContent = 'Subiendo video...';
             mensajeSubida.style.color = 'yellow';
 
-            // Enviar los datos por separado como espera el backend
+            // Ahora el backend usa @RequestParam, enviamos como FormData
             const endpoint = `https://parcial-final-avanzada-production-cdde.up.railway.app/video/crear/${userId}`;
+            
+            // Crear FormData para enviar parámetros
+            const formData = new FormData();
+            formData.append('titulo', titulo);
+            formData.append('miniatura_src', miniatura_src);
+            formData.append('video_src', video_src);
+            formData.append('descripcion', descripcion);
             
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        titulo: titulo,
-                        descripcion: descripcion,
-                        miniatura_src: miniatura_src,
-                        video_src: video_src
-                    })
+                    body: formData
                 });
 
                 if (!response.ok) {
