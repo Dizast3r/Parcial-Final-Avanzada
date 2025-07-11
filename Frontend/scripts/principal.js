@@ -628,4 +628,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los videos al inicio
     cargarVideos();
+
+    // Lógica para el botón hamburguesa que minimiza/expande la barra lateral y el contenido principal
+    let myHamburgerBtn = document.getElementById('hamburgerBtn');
+    if (!myHamburgerBtn) {
+        myHamburgerBtn = document.createElement('button');
+        myHamburgerBtn.id = 'hamburgerBtn';
+        myHamburgerBtn.setAttribute('aria-label', 'Mostrar/ocultar barra lateral');
+        myHamburgerBtn.className = 'hamburger-btn';
+        myHamburgerBtn.innerHTML = `
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="7" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                <rect y="14" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                <rect y="21" width="32" height="3.5" rx="1.5" fill="#fff"/>
+            </svg>
+        `;
+        // Insertar en la barra superior si existe
+        const navbarLeft = document.querySelector('.navbar-left');
+        if (navbarLeft) {
+            navbarLeft.insertBefore(myHamburgerBtn, navbarLeft.firstChild);
+        } else {
+            document.body.insertBefore(myHamburgerBtn, document.body.firstChild);
+        }
+    } else {
+        // Si ya existe, asegúrate de que tenga el SVG correcto
+        myHamburgerBtn.innerHTML = `
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="7" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                <rect y="14" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                <rect y="21" width="32" height="3.5" rx="1.5" fill="#fff"/>
+            </svg>
+        `;
+        myHamburgerBtn.className = 'hamburger-btn';
+    }
+
+    // Sincronizar SIEMPRE el estado de barra lateral y contenido
+    myHamburgerBtn.addEventListener('click', () => {
+        if (barralateral && contenidoPrincipal) {
+            const isMini = barralateral.classList.contains('mini');
+            if (isMini) {
+                barralateral.classList.remove('mini');
+                contenidoPrincipal.classList.remove('mini-sidebar');
+            } else {
+                barralateral.classList.add('mini');
+                contenidoPrincipal.classList.add('mini-sidebar');
+            }
+        }
+    });
 });
