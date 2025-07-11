@@ -133,6 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Redirigir a suscriptores.html al hacer clic en "Suscriptores"
+    const suscriptoresLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
+        .find(el => el.textContent.trim() === 'Suscriptores')?.parentElement;
+    if (suscriptoresLink) {
+        suscriptoresLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'suscriptores.html';
+        });
+    }
+
     // Cargar todos los videos publicados usando el endpoint correcto /video/todos
     async function cargarVideos() {
         try {
