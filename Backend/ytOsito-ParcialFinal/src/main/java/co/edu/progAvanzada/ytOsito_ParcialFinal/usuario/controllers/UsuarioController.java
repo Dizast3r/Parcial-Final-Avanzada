@@ -76,7 +76,6 @@ public class UsuarioController {
     @PostMapping("/login")
     public Usuario iniciarSesion(@RequestBody Usuario usuario) {
         // Este endpoint no tiene @Valid porque no necesita validar que los demás campos estén completos
-        System.out.println("➡️ Login recibido: " + usuario.getNickname() + "/" + usuario.getPassword());
         return usuarioService.iniciarSesion(usuario.getNickname(), usuario.getPassword());
     }
 

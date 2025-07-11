@@ -6,38 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
         canalNickname.textContent = nickname;
     }
 
-    // Mossstrar videos publicados (fetch real)
-    async function cargarVideosUsuario() {
-        const videosList = document.getElementById('videosList');
-        videosList.classList.add('empty');
-        videosList.textContent = 'No has publicado ningún video aún.';
-        const nickname = localStorage.getItem('nickname');
-        if (!nickname) return;
-        // Obtener usuarioId por nickname
-        try {
-            const usuarioResp = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/nickname=${nickname}`);
-            const usuarioData = await usuarioResp.json();
-            if (!usuarioData || !usuarioData.id) return;
-            const usuarioId = usuarioData.id;
-            // Obtener videos del usuario
-            const videosResp = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/usuario/${usuarioId}`);
-            const videos = await videosResp.json();
-            if (Array.isArray(videos) && videos.length > 0) {
-                videosList.classList.remove('empty');
-                videosList.textContent = '';
-                videos.forEach(video => agregarVideoAlCanal({
-                    titulo: video.titulo,
-                    descripcion: video.descripcion || video.Descripcion,
-                    miniatura: video.miniatura_src,
-                    url: video.video_src
-                }));
-            }
-        } catch (e) {
-            // Si hay error, dejar mensaje vacío
-        }
-    }
-    cargarVideosUsuario();
-
     // Crear y mostrar el formulario modal para subir video
     function mostrarModalSubirVideo() {
         // Crear overlay
@@ -61,13 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>Subir video</h2>
             <form id="formSubirVideo">
                 <label for="tituloVideo">Título del video</label>
-                <input type="text" id="tituloVideo" name="tituloVideo" required />
+                <input type="text" id="tituloVideo" name="tituloVideo" required maxlength="50" />
                 <label for="descripcionVideo">Descripción</label>
-                <textarea id="descripcionVideo" name="descripcionVideo" required></textarea>
+                <textarea id="descripcionVideo" name="descripcionVideo" required maxlength="400"></textarea>
                 <label for="miniaturaUrl">URL de la miniatura</label>
-                <input type="text" id="miniaturaUrl" name="miniaturaUrl" required />
+                <input type="url" id="miniaturaUrl" name="miniaturaUrl" required maxlength="300" />
                 <label for="videoUrl">URL del video</label>
-                <input type="text" id="videoUrl" name="videoUrl" required />
+                <input type="url" id="videoUrl" name="videoUrl" required maxlength="300" />
                 <div class="modal-btns">
                     <button type="submit">Subir video</button>
                     <button type="button" id="cerrarModalBtn">Cancelar</button>
@@ -88,83 +56,183 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
 
+        // Cerrar modal al hacer clic fuera
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+            }
+        });
+
         // Cerrar modal
         document.getElementById('cerrarModalBtn').onclick = () => {
             overlay.remove();
         };
 
-        // Subir video
-        document.getElementById('formSubirVideo').onsubmit = async function(e) {
+        // Manejar el submit del formulario de subir video
+        const formSubirVideo = document.getElementById('formSubirVideo');
+        const mensajeSubida = document.getElementById('mensajeSubida');
+        
+        formSubirVideo.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const mensaje = document.getElementById('mensajeSubida');
-            const progreso = document.getElementById('progresoSubida');
-            mensaje.textContent = 'Subiendo video...';
-            progreso.textContent = '';
-            let percent = 0;
-            // Animación de carga
-            const interval = setInterval(() => {
-                percent++;
-                progreso.textContent = `Cargando: ${percent * 10}%`;
-                if (percent >= 10) {
-                    clearInterval(interval);
-                    mensaje.textContent = '¡Se ha subido el video correctamente!';
-                    progreso.textContent = '';
-                    setTimeout(() => {
-                        overlay.remove();
-                        cargarVideosUsuario(); // Refrescar lista de videos desde el backend
-                    }, 1200);
-                }
-            }, 100);
-            // Obtener usuarioId directamente del localStorage si ya está guardado
-            let usuarioId = localStorage.getItem('usuarioId');
-            if (!usuarioId) {
-                try {
-                    const usuarioResp = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/nickname=${localStorage.getItem('nickname')}`);
-                    const usuarioData = await usuarioResp.json();
-                    usuarioId = usuarioData.id;
-                    if (usuarioId) localStorage.setItem('usuarioId', usuarioId);
-                } catch {}
+            mensajeSubida.textContent = '';
+            mensajeSubida.style.color = '';
+
+            // Obtener datos del formulario
+            const titulo = document.getElementById('tituloVideo').value.trim();
+            const descripcion = document.getElementById('descripcionVideo').value.trim();
+            const miniatura_src = document.getElementById('miniaturaUrl').value.trim();
+            const video_src = document.getElementById('videoUrl').value.trim();
+
+            // Validaciones básicas
+            if (!titulo || !descripcion || !miniatura_src || !video_src) {
+                mensajeSubida.textContent = 'Todos los campos son obligatorios.';
+                mensajeSubida.style.color = 'red';
+                return;
             }
-            // Enviar al backend usando el endpoint /video/crear
-            if (usuarioId) {
-                await fetch('https://parcial-final-avanzada-production-cdde.up.railway.app/video/crear', {
+
+            if (titulo.length > 50) {
+                mensajeSubida.textContent = 'El título no puede tener más de 50 caracteres.';
+                mensajeSubida.style.color = 'red';
+                return;
+            }
+
+            if (descripcion.length > 400) {
+                mensajeSubida.textContent = 'La descripción no puede tener más de 400 caracteres.';
+                mensajeSubida.style.color = 'red';
+                return;
+            }
+
+            // Obtener usuario de localStorage
+            let usuario = null;
+            let usuarioStr = localStorage.getItem('usuario');
+            if (!usuarioStr) {
+                mensajeSubida.textContent = 'No se encontró información del usuario. Inicia sesión de nuevo.';
+                mensajeSubida.style.color = 'red';
+                return;
+            }
+
+            try {
+                usuario = JSON.parse(usuarioStr);
+            } catch (err) {
+                mensajeSubida.textContent = 'Error al leer los datos del usuario.';
+                mensajeSubida.style.color = 'red';
+                return;
+            }
+
+            let userId = usuario.id;
+            if (typeof userId === 'string' && userId.includes(':')) {
+                userId = userId.split(':')[0];
+            }
+            
+            if (!userId) {
+                mensajeSubida.textContent = 'No se encontró el ID del usuario. Vuelve a iniciar sesión.';
+                mensajeSubida.style.color = 'red';
+                return;
+            }
+
+            // Convertir userId a número si es string
+            userId = parseInt(userId);
+            if (isNaN(userId)) {
+                mensajeSubida.textContent = 'ID de usuario inválido. Vuelve a iniciar sesión.';
+                mensajeSubida.style.color = 'red';
+                return;
+            }
+
+            // Mostrar mensaje de carga
+            mensajeSubida.textContent = 'Subiendo video...';
+            mensajeSubida.style.color = 'yellow';
+
+            // Enviar los datos por separado como espera el backend
+            const endpoint = `https://parcial-final-avanzada-production-cdde.up.railway.app/video/crear/${userId}`;
+            
+            try {
+                const response = await fetch(endpoint, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
-                        titulo: document.getElementById('tituloVideo').value,
-                        miniatura_src: document.getElementById('miniaturaUrl').value,
-                        video_src: document.getElementById('videoUrl').value,
-                        Descripcion: document.getElementById('descripcionVideo').value,
-                        usuario: { id: usuarioId },
-                        vistas: 0
+                        titulo: titulo,
+                        descripcion: descripcion,
+                        miniatura_src: miniatura_src,
+                        video_src: video_src
                     })
                 });
+
+                if (!response.ok) {
+                    let errMsg = 'Error al subir el video';
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.message) {
+                            errMsg = errorData.message;
+                        } else if (errorData.error) {
+                            errMsg = errorData.error;
+                        }
+                    } catch (jsonError) {
+                        errMsg = `Error ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errMsg);
+                }
+
+                const videoCreado = await response.json();
+                mensajeSubida.textContent = '¡Video subido exitosamente!';
+                mensajeSubida.style.color = 'lightgreen';
+                
+                // Limpiar formulario
+                formSubirVideo.reset();
+                
+                // Agregar video al canal si existe la función
+                if (typeof agregarVideoAlCanal === 'function') {
+                    agregarVideoAlCanal({
+                        titulo: videoCreado.titulo,
+                        descripcion: videoCreado.descripcion || videoCreado.Descripcion,
+                        miniatura: videoCreado.miniatura_src,
+                        url: videoCreado.video_src
+                    });
+                }
+                
+                // Cerrar modal después de un tiempo
+                setTimeout(() => {
+                    overlay.remove();
+                    // Opcional: recargar la página para mostrar el nuevo video
+                    // window.location.reload();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error al subir video:', error);
+                mensajeSubida.textContent = error.message || 'Error al subir el video';
+                mensajeSubida.style.color = 'red';
             }
-        };
+        });
     }
 
     // Agregar video al canal (simulado)
     function agregarVideoAlCanal(video) {
         const videosList = document.getElementById('videosList');
-        videosList.classList.remove('empty');
-        // Crear contenedor de video
-        const div = document.createElement('div');
-        div.className = 'video-item';
-        div.innerHTML = `
-            <div class="video-miniatura-container" style="display:flex;align-items:center;gap:16px;">
-                <img src="${video.miniatura}" alt="Miniatura" style="width:120px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;">
-                <div>
-                    <strong>${video.titulo}</strong><br>
-                    <span style="font-size:0.95rem;color:#ccc;">${video.descripcion}</span>
+        if (videosList) {
+            videosList.classList.remove('empty');
+            
+            // Crear contenedor de video
+            const div = document.createElement('div');
+            div.className = 'video-item';
+            div.innerHTML = `
+                <div class="video-miniatura-container" style="display:flex;align-items:center;gap:16px;">
+                    <img src="${video.miniatura}" alt="Miniatura" style="width:120px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;">
+                    <div>
+                        <strong>${video.titulo}</strong><br>
+                        <span style="font-size:0.95rem;color:#ccc;">${video.descripcion}</span>
+                    </div>
                 </div>
-            </div>
-        `;
-        // Evento para mostrar el video pequeño al hacer click en la miniatura
-        const miniatura = div.querySelector('img');
-        miniatura.addEventListener('click', () => {
-            mostrarVideoMini(video.url, video.titulo);
-        });
-        videosList.appendChild(div);
+            `;
+            
+            // Evento para mostrar el video pequeño al hacer click en la miniatura
+            const miniatura = div.querySelector('img');
+            miniatura.addEventListener('click', () => {
+                mostrarVideoMini(video.url, video.titulo);
+            });
+            
+            videosList.appendChild(div);
+        }
     }
 
     // Mostrar video pequeño en el lugar
@@ -189,21 +257,34 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.body.appendChild(overlay);
+        
+        // Cerrar modal al hacer clic fuera
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+            }
+        });
+        
         document.getElementById('cerrarVideoMini').onclick = () => overlay.remove();
     }
 
-    // Botón para subir video (puedes enlazar a un formulario o modal)
-    document.getElementById('subirVideoBtn').addEventListener('click', mostrarModalSubirVideo);
+    // Botón para subir video
+    const subirVideoBtn = document.getElementById('subirVideoBtn');
+    if (subirVideoBtn) {
+        subirVideoBtn.addEventListener('click', mostrarModalSubirVideo);
+    }
 
     // Menú desplegable de usuario
     const profileMenuBtn = document.getElementById('profileMenuBtn');
     const profileMenuDropdown = document.getElementById('profileMenuDropdown');
     const profileMenuContainer = profileMenuBtn?.parentElement;
+    
     if (profileMenuBtn && profileMenuDropdown && profileMenuContainer) {
         profileMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             profileMenuContainer.classList.toggle('open');
         });
+        
         document.addEventListener('click', (e) => {
             if (!profileMenuContainer.contains(e.target)) {
                 profileMenuContainer.classList.remove('open');
@@ -218,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('nickname');
+            localStorage.removeItem('usuario');
             alert('Sesión cerrada correctamente.');
             window.location.href = 'login.html';
         });
@@ -231,4 +313,43 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'principal.html';
         });
     }
+
+    // Cargar videos existentes del usuario al cargar la página
+    async function cargarVideosDelUsuario() {
+        try {
+            const usuarioStr = localStorage.getItem('usuario');
+            if (!usuarioStr) return;
+
+            const usuario = JSON.parse(usuarioStr);
+            let userId = usuario.id;
+            
+            if (typeof userId === 'string' && userId.includes(':')) {
+                userId = userId.split(':')[0];
+            }
+            
+            userId = parseInt(userId);
+            if (isNaN(userId)) return;
+
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/todos`);
+            
+            if (response.ok) {
+                const videos = await response.json();
+                const videosDelUsuario = videos.filter(video => video.usuario && video.usuario.id === userId);
+                
+                videosDelUsuario.forEach(video => {
+                    agregarVideoAlCanal({
+                        titulo: video.titulo,
+                        descripcion: video.descripcion || video.Descripcion,
+                        miniatura: video.miniatura_src,
+                        url: video.video_src
+                    });
+                });
+            }
+        } catch (error) {
+            console.error('Error al cargar videos:', error);
+        }
+    }
+
+    // Cargar videos al iniciar
+    cargarVideosDelUsuario();
 });

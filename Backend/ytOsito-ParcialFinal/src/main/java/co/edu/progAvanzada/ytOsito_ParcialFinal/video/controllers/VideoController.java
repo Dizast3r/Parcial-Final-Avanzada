@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -58,10 +59,10 @@ public class VideoController {
      */
     @PostMapping("/crear/{usuarioId}")
     public Video crearVideo(@PathVariable Long usuarioId, 
-                           @RequestBody String titulo, 
-                           @RequestBody String miniatura_src, 
-                           @RequestBody String video_src, 
-                           @RequestBody String descripcion) {
+                           @RequestParam String titulo, 
+                           @RequestParam String miniatura_src, 
+                           @RequestParam String video_src, 
+                           @RequestParam String descripcion) {
         return videoService.crearVideo(usuarioId, titulo, miniatura_src, video_src, descripcion);
     }
 

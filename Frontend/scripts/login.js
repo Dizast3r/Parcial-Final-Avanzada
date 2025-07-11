@@ -27,9 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            localStorage.setItem('token', data.token);
+            // Guardar el nickname
             localStorage.setItem('nickname', nickname);
-
+            // Guardar el usuario completo como JSON string (el backend retorna el usuario directamente)
+            localStorage.setItem('usuario', JSON.stringify(data));
             window.location.href = 'principal.html';
         } catch (error) {
             errorMsg.textContent = error.message;
