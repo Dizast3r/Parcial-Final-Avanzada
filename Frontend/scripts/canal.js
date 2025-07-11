@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Agregar video al canal si existe la función
                 if (typeof agregarVideoAlCanal === 'function') {
                     agregarVideoAlCanal({
+                        id: videoCreado.id,
                         titulo: videoCreado.titulo,
                         descripcion: videoCreado.descripcion || videoCreado.Descripcion,
                         miniatura: videoCreado.miniatura_src,
@@ -205,7 +206,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Agregar video al canal (simulado)
+    // Función para eliminar video
+    async function eliminarVideo(videoId, videoElement) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este video?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/${videoId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al eliminar el video');
+            }
+
+            // Remover el elemento del DOM
+            videoElement.remove();
+            
+            // Mostrar mensaje de éxito
+            const mensaje = document.createElement('div');
+            mensaje.style.position = 'fixed';
+            mensaje.style.top = '20px';
+            mensaje.style.right = '20px';
+            mensaje.style.background = '#4CAF50';
+            mensaje.style.color = '#fff';
+            mensaje.style.padding = '1rem 1.5rem';
+            mensaje.style.borderRadius = '8px';
+            mensaje.style.zIndex = '9999';
+            mensaje.textContent = 'Video eliminado exitosamente';
+            document.body.appendChild(mensaje);
+
+            // Remover mensaje después de 3 segundos
+            setTimeout(() => {
+                mensaje.remove();
+            }, 3000);
+
+        } catch (error) {
+            console.error('Error al eliminar video:', error);
+            alert('Error al eliminar el video. Inténtalo de nuevo.');
+        }
+    }
+
+    // Agregar video al canal (con botón eliminar)
     function agregarVideoAlCanal(video) {
         const videosList = document.getElementById('videosList');
         if (videosList) {
@@ -215,19 +258,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'video-item';
             div.innerHTML = `
-                <div class="video-miniatura-container" style="display:flex;align-items:center;gap:16px;">
-                    <img src="${video.miniatura}" alt="Miniatura" style="width:120px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;">
-                    <div>
-                        <strong>${video.titulo}</strong><br>
-                        <span style="font-size:0.95rem;color:#ccc;">${video.descripcion}</span>
+                <div class="video-content">
+                    <div class="video-info">
+                        <img src="${video.miniatura}" alt="Miniatura" class="video-miniatura">
+                        <div class="video-details">
+                            <h4 class="video-titulo">${video.titulo}</h4>
+                            <p class="video-descripcion">${video.descripcion}</p>
+                        </div>
                     </div>
+                    <button class="eliminar-btn" data-video-id="${video.id}">
+                        <span class="eliminar-icono">🗑️</span>
+                        Eliminar
+                    </button>
                 </div>
             `;
             
             // Evento para mostrar el video pequeño al hacer click en la miniatura
-            const miniatura = div.querySelector('img');
+            const miniatura = div.querySelector('.video-miniatura');
             miniatura.addEventListener('click', () => {
                 mostrarVideoMini(video.url, video.titulo, video.descripcion);
+            });
+            
+            // Evento para eliminar video
+            const eliminarBtn = div.querySelector('.eliminar-btn');
+            eliminarBtn.addEventListener('click', () => {
+                eliminarVideo(video.id, div);
             });
             
             videosList.appendChild(div);
@@ -338,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 videosDelUsuario.forEach(video => {
                     agregarVideoAlCanal({
+                        id: video.id,
                         titulo: video.titulo,
                         descripcion: video.descripcion || video.Descripcion,
                         miniatura: video.miniatura_src,
