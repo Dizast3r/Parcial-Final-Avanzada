@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Canal - Ositube</title>
+    <link rel="stylesheet" href="styles/canal.css">
+</head>
+<body>
+    <div class="canal-container">
+        <nav class="navbar">
+            <div class="navbar-profile">
+                <div class="profile-menu-container">
+                    <button class="profile-menu-btn" id="profileMenuBtn" aria-label="Menú de usuario">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                    <div class="profile-menu-dropdown" id="profileMenuDropdown">
+                        <a href="#" id="menuInicio">Inicio</a>
+                        <a href="#" id="menuCerrarSesion">Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <aside class="canal-sidebar">
+            <div class="canal-profile">
+                <div class="profile-circle">
+                    <span class="profile-icon">&#128100;</span>
+                </div>
+                <div class="canal-label">Tu canal</div>
+                <div class="canal-nickname" id="canalNickname"></div>
+            </div>
+            <div class="canal-options">
+                <button id="subirVideoBtn">Subir video</button>
+            </div>
+        </aside>
+        <main class="canal-main">
+            <h2>Contenido del canal</h2>
+            <div class="canal-videos">
+                <h3>Videos</h3>
+                <div id="videosList" class="videos-list">
+                    <!-- Aquí se mostrarán los videos publicados -->
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="scripts/canal.js"></script>
+</body>
+</html>

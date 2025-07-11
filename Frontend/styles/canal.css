@@ -1,0 +1,186 @@
+body {
+    background: #181818;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.canal-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.canal-sidebar {
+    width: 280px;
+    background: #222;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 1rem 1rem;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+}
+
+.canal-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.profile-circle {
+    width: 80px;
+    height: 80px;
+    background: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #fff;
+    border: 3px solid #7614a3;
+    margin-bottom: 1rem;
+}
+
+.canal-label {
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+}
+
+.canal-nickname {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+.canal-options {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#subirVideoBtn {
+    padding: 0.7rem 1.5rem;
+    background: #7614a3;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background 0.2s;
+}
+#subirVideoBtn:hover {
+    background: #5a1078;
+}
+
+.canal-main {
+    flex: 1;
+    padding: 2.5rem 3rem;
+}
+
+.canal-main h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+.canal-videos h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+}
+
+.videos-list {
+    min-height: 120px;
+    background: #232323;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.video-item {
+    background: #292929;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.videos-list.empty {
+    color: #888;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.navbar-profile {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 24px;
+    top: 8px;
+}
+
+.profile-menu-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.profile-menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
+.profile-menu-btn .hamburger-line {
+    width: 22px;
+    height: 3px;
+    background: #fff;
+    margin: 3px 0;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+.profile-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: #232323;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    min-width: 140px;
+    z-index: 100;
+    flex-direction: column;
+    padding: 0.5rem 0;
+}
+
+.profile-menu-dropdown a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.7rem 1.2rem;
+    display: block;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+.profile-menu-dropdown a:hover {
+    background: #7614a3;
+}
+
+.profile-menu-container.open .profile-menu-dropdown {
+    display: flex;
+}

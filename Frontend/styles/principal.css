@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -13,23 +12,35 @@ body {
     position: relative;
 }
 
-.hamburger-btn {
-    display: none;
+/* Barra superior de navegación */
+.navbar {
     position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1001;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background-color: #0f0f0f;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 1000;
+    border-bottom: 1px solid #3f3f3f;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    margin-right: 40px;
+}
+
+.hamburger-btn {
     background: none;
     border: none;
     cursor: pointer;
     padding: 8px;
     border-radius: 4px;
     transition: background-color 0.2s;
-}
-
-/* Mostrar botón cuando la barra lateral está oculta */
-.hamburger-btn.show {
-    display: block;
+    margin-right: 16px;
 }
 
 .hamburger-btn:hover {
@@ -45,13 +56,124 @@ body {
     transition: 0.3s;
 }
 
-/* Botón hamburguesa interno de la barra lateral */
+.logo {
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+}
+
+.buscar-container {
+    flex: 1;
+    max-width: 640px;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.buscar-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: #121212;
+    border: 1px solid #3f3f3f;
+    border-radius: 40px;
+    overflow: hidden;
+}
+
+.buscar-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 16px;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.buscar-input::placeholder {
+    color: #aaa;
+}
+
+.buscar-btn {
+    background-color: #272727;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 0 40px 40px 0;
+    transition: background-color 0.2s;
+}
+
+.buscar-btn:hover {
+    background-color: #3f3f3f;
+}
+
+.buscar-icon {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+.navbar-profile {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 24px;
+    top: 8px;
+}
+
+.profile-circle {
+    width: 40px;
+    height: 40px;
+    background: #222;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    border: 2px solid #7614a3;
+}
+
+.profile-icon {
+    font-size: 1.6rem;
+    color: #fff;
+}
+
+.profile-nickname {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: bold;
+}
+
+.barralateral {
+    width: 240px;
+    height: 100vh;
+    background-color: #0f0f0f;
+    padding: 0;
+    overflow-y: auto;
+    border-right: 1px solid #3f3f3f;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    transition: transform 0.3s ease;
+}
+
+.barralateral.hidden {
+    transform: translateX(-100%);
+}
+
 .barralateral-header {
     display: flex;
     align-items: center;
     padding: 12px 24px;
     border-bottom: 1px solid #3f3f3f;
     margin-bottom: 8px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    background-color: #0f0f0f;
+    z-index: 1001;
 }
 
 .sidebar-toggle-btn {
@@ -93,26 +215,6 @@ body {
 .barralateral-overlay.active {
     opacity: 1;
     visibility: visible;
-}
-
-/* Barra lateral */
-.barralateral {
-    width: 240px;
-    height: 100vh;
-    background-color: #0f0f0f;
-    padding: 0;
-    overflow-y: auto;
-    border-right: 1px solid #3f3f3f;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    transition: transform 0.3s ease;
-}
-
-/* Estado oculto de la barra lateral */
-.barralateral.hidden {
-    transform: translateX(-100%);
 }
 
 .barralateral-content {
@@ -169,18 +271,60 @@ body {
 .contenido-principal {
     flex: 1;
     margin-left: 240px;
+    margin-top: 56px;
     padding: 20px;
     transition: margin-left 0.3s ease;
 }
 
-/* Cuando la barra lateral está oculta, expandir contenido principal */
 .contenido-principal.expanded {
     margin-left: 0;
 }
 
+.barralateral-mini {
+    width: 72px;
+    transform: translateX(0);
+}
+
+.barralateral-mini .barralateral-header {
+    padding: 12px 24px;
+}
+
+.barralateral-mini .barralateral-item {
+    padding: 16px 24px;
+    flex-direction: column;
+    text-align: center;
+}
+
+.barralateral-mini .barralateral-item .icon {
+    margin-right: 0;
+    margin-bottom: 6px;
+}
+
+.barralateral-mini .barralateral-item .text {
+    font-size: 10px;
+    line-height: 1.2;
+}
+
+.barralateral-mini .section-title {
+    display: none;
+}
+
+.barralateral-mini .dividir {
+    display: none;
+}
+
+.contenido-principal.mini-sidebar {
+    margin-left: 72px;
+}
+
 @media (max-width: 768px) {
-    .hamburger-btn {
-        display: block;
+    .navbar-left {
+        margin-right: 20px;
+    }
+
+    .search-container {
+        max-width: none;
+        margin: 0 20px;
     }
 
     .barralateral {
@@ -193,17 +337,9 @@ body {
 
     .contenido-principal {
         margin-left: 0;
-        padding-top: 70px;
     }
 
-    body {
-        flex-direction: column;
-    }
-}
-
-/* En desktop, mostrar el botón cuando la barra lateral está oculta */
-@media (min-width: 769px) {
-    .hamburger-btn.show {
-        display: block;
+    .contenido-principal.expanded {
+        margin-left: 0;
     }
 }
