@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
     const contenidoPrincipal = document.getElementById('contenidoPrincipal');
+    const videosGrid = document.getElementById('videosGrid');
+    const profileNickname = document.getElementById('profileNickname');
     
     let isMiniSidebar = false;
 
@@ -66,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Mostrar nickname en el perfil
-    const profileNickname = document.getElementById('profileNickname');
     const userToken = localStorage.getItem('token');
     let nickname = '';
     // Si guardaste el nickname en localStorage, úsalo directamente
@@ -138,5 +139,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function cargarVideos() {
+        try {
+            const response = await fetch('https://parcial-final-avanzada-production-cdde.up.railway.app/video/todos');
+            if (!response.ok) throw new Error('No se pudieron cargar los videos');
+            const videos = await response.json();
+            videosGrid.innerHTML = '';
+            if (!Array.isArray(videos) || videos.length === 0) {
+                videosGrid.innerHTML = '<div style="color:#fff;font-size:1.2rem;">No hay videos disponibles.</div>';
+                return;
+            }
+            videos.forEach(video => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <img class="video-thumb" src="${video.miniatura_src}" alt="Miniatura">
+                    <div class="video-card-content">
+                        <div class="video-title">${video.titulo}</div>
+                        <div class="video-desc">${video.descripcion || video.Descripcion || ''}</div>
+                        <div class="video-meta">
+                            <span>👁️ ${video.vistas ?? 0} vistas</span>
+                            <span>🎬 ${video.usuario?.nickname || 'Desconocido'}</span>
+                        </div>
+                    </div>
+                `;
+                // Al hacer click en la miniatura, mostrar el video en grande
+                card.querySelector('.video-thumb').addEventListener('click', () => {
+                    mostrarModalVideo(video.video_src, video.titulo);
+                });
+                videosGrid.appendChild(card);
+            });
+        } catch (error) {
+            videosGrid.innerHTML = `<div style='color:#fff;'>${error.message}</div>`;
+        }
+    }
+
+    function mostrarModalVideo(url, titulo) {
+        let overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100vw';
+        overlay.style.height = '100vh';
+        overlay.style.background = 'rgba(0,0,0,0.8)';
+        overlay.style.zIndex = 3000;
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.innerHTML = `
+            <div style="background:#232323;padding:2rem 2.5rem;border-radius:18px;box-shadow:0 4px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;align-items:center;">
+                <h2 style="color:#fff;margin-bottom:1.2rem;">${titulo}</h2>
+                <video src="${url}" controls autoplay style="width:480px;max-width:80vw;height:270px;max-height:60vh;border-radius:12px;background:#000;"></video>
+                <button id="cerrarModalVideo" style="margin-top:1.5rem;padding:0.6rem 2rem;background:#7614a3;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Cerrar</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        document.getElementById('cerrarModalVideo').onclick = () => overlay.remove();
+    }
+
     cargarVideosTodosPrincipal();
+    cargarVideos();
 });

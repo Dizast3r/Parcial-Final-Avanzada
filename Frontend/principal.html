@@ -103,13 +103,15 @@
                     </svg>
                     <span class="text">Cerrar sesión</span>
                 </a>
+            </div>
         </div>
     </div>
 
-    <div class="contenido-principal" id="contenidoPrincipal" style="padding:2rem 2rem 4rem 2rem;min-height:80vh;background:#181818;margin-left:240px;">
-            <h1 style="font-size:2.2rem;margin-bottom:2.2rem;color:#fff;">Videos</h1>
-            <!-- Aquí se cargarán los videos tipo cards grandes -->
-        </div>
+    <!-- El contenido principal ahora está dentro del body -->
+    <div class="contenido-principal" id="contenidoPrincipal">
+        <h1 style="font-size:2.2rem;margin-bottom:2.2rem;color:#fff;">Videos</h1>
+        <div id="videosGrid" class="videos-grid"></div>
+    </div>
 
     <script src="scripts/principal.js"></script>
 </body>

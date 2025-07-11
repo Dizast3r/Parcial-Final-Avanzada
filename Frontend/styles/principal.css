@@ -7,9 +7,9 @@
 }
 
 body {
-    background-color: #0f0f0f;
-    display: flex;
-    position: relative;
+    background: #181818;
+    margin: 0;
+    padding: 0;
 }
 
 /* Barra superior de navegación */
@@ -147,15 +147,15 @@ body {
 
 .barralateral {
     width: 240px;
+    min-width: 240px;
+    background: #232323;
     height: 100vh;
-    background-color: #0f0f0f;
-    padding: 0;
-    overflow-y: auto;
-    border-right: 1px solid #3f3f3f;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 999;
+    overflow-y: auto;
+    border-right: 1px solid #3f3f3f;
     transition: transform 0.3s ease;
 }
 
@@ -268,11 +268,13 @@ body {
     color: white;
 }
 
+/* Contenido principal corregido */
 .contenido-principal {
-    flex: 1;
-    margin-left: 240px;
-    margin-top: 56px;
-    padding: 20px;
+    margin-left: 240px; /* Espacio para la barra lateral */
+    margin-top: 56px;    /* Espacio para la navbar */
+    padding: 2rem 2rem 4rem 2rem;
+    min-height: calc(100vh - 56px);
+    background: #181818;
     transition: margin-left 0.3s ease;
 }
 
@@ -318,100 +320,77 @@ body {
 }
 
 .videos-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2.5rem 2rem;
-    justify-content: flex-start;
-    margin: 0 auto;
-    max-width: 1400px;
-    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
 }
 
-.video-card-inicio {
-    background: #181818;
-    border-radius: 18px;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-    width: 370px;
-    margin-bottom: 1.5rem;
+.video-card {
+    background: #232323;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    transition: box-shadow 0.2s, transform 0.2s;
+    transition: transform 0.15s;
+}
+
+.video-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+}
+
+.video-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: #111;
     cursor: pointer;
 }
 
-.video-card-inicio:hover {
-    box-shadow: 0 8px 40px rgba(0,0,0,0.28);
-    transform: translateY(-4px) scale(1.02);
-}
-
-.video-thumb-container {
-    position: relative;
-    width: 100%;
-    height: 210px;
-    background: #000;
-}
-
-.video-thumb-inicio {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.video-duration {
-    position: absolute;
-    bottom: 10px;
-    right: 12px;
-    background: rgba(0,0,0,0.7);
+.video-card-content {
+    padding: 1.2rem 1.5rem 1.2rem 1.5rem;
     color: #fff;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.95rem;
-}
-
-.video-info-inicio {
     display: flex;
-    align-items: flex-start;
-    gap: 1.1rem;
-    padding: 1.1rem 1.2rem 1.2rem 1.2rem;
+    flex-direction: column;
+    gap: 0.7rem;
 }
 
-.canal-img-inicio {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #232323;
-    border: 2px solid #333;
+.video-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.2rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.video-desc {
+    font-size: 0.98rem;
+    color: #ccc;
+    max-height: 3.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .video-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.video-title-inicio {
-    font-size: 1.18rem;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 0.2rem;
-    line-height: 1.2;
-}
-
-.video-canal-nombre {
+    font-size: 0.92rem;
     color: #aaa;
-    font-size: 1.02rem;
-    margin-top: 0.1rem;
+    margin-top: 0.2rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
     .navbar-left {
         margin-right: 20px;
     }
 
-    .search-container {
+    .buscar-container {
         max-width: none;
         margin: 0 20px;
     }
@@ -430,5 +409,16 @@ body {
 
     .contenido-principal.expanded {
         margin-left: 0;
+    }
+
+    .contenido-principal.mini-sidebar {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .videos-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
     }
 }
