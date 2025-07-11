@@ -95,36 +95,33 @@ body {
 
 .buscar-container {
     flex: 1;
-    max-width: 640px;
     display: flex;
+    justify-content: center;
     align-items: center;
-    margin: 0 auto;
-    position: relative;
 }
 
 .buscar-box {
-    flex: 1;
     display: flex;
     align-items: center;
-    background-color: #121212;
-    border: 1px solid #3f3f3f;
-    border-radius: 40px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-}
-
-.buscar-box:focus-within {
-    border-color: #1c62b9;
+    background: #222;
+    border-radius: 24px;
+    padding: 2px 16px; /* menos alto, más largo */
+    box-shadow: 0 1px 4px #0002;
+    width: 540px; /* más larga */
+    max-width: 800px;
+    min-width: 220px;
+    height: 38px; /* menos alto */
 }
 
 .buscar-input {
-    flex: 1;
-    background: transparent;
     border: none;
-    padding: 12px 16px;
-    color: white;
-    font-size: 16px;
+    background: transparent;
+    color: #fff;
+    font-size: 1rem;
+    padding: 6px 12px; /* menos alto */
     outline: none;
+    width: 440px; /* más largo */
+    height: 34px; /* menos alto */
 }
 
 .buscar-input::placeholder {
@@ -132,25 +129,29 @@ body {
 }
 
 .buscar-btn {
-    background-color: #272727;
+    background: #222;
     border: none;
-    padding: 12px 20px;
-    cursor: pointer;
-    border-radius: 0 40px 40px 0;
-    transition: background-color 0.2s;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: none;
+    padding: 0;
 }
 
 .buscar-btn:hover {
-    background-color: #3f3f3f;
+    background: #333;
 }
 
 .buscar-icon {
-    width: 24px;
-    height: 24px;
-    fill: white;
+    fill: #fff;
+    width: 22px;
+    height: 22px;
 }
 
 .navbar-profile {
