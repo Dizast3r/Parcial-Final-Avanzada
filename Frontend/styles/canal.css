@@ -184,3 +184,91 @@ body {
 .profile-menu-container.open .profile-menu-dropdown {
     display: flex;
 }
+
+/* Modal subir video */
+#modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-subir-video {
+    background: #232323;
+    padding: 2rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 400px;
+    color: #fff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-subir-video h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.modal-subir-video label {
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+    font-weight: bold;
+}
+
+.modal-subir-video input,
+.modal-subir-video textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid #7614a3;
+    background: #181818;
+    color: #fff;
+    margin-bottom: 0.7rem;
+    font-size: 1rem;
+}
+
+.modal-btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.modal-btns button {
+    flex: 1;
+    padding: 0.7rem 0;
+    border: none;
+    border-radius: 8px;
+    background: #7614a3;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-btns button:hover {
+    background: #5a1078;
+}
+
+.mensaje-subida {
+    margin-top: 1rem;
+    text-align: center;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.progreso-subida {
+    margin-top: 0.5rem;
+    text-align: center;
+    color: #aaa;
+    font-size: 0.95rem;
+}

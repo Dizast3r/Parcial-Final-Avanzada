@@ -45,6 +45,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             registerMsg.textContent = error.message;
             registerMsg.style.color = 'red';
+            // Limpiar estilos previos
+            form.querySelectorAll('input, select').forEach(el => {
+                el.style.borderColor = '';
+            });
+            // Marcar campo con error si es posible
+            if (error.message.toLowerCase().includes('nickname')) {
+                document.getElementById('nickname').style.border = '2px solid red';
+            } else if (error.message.toLowerCase().includes('correo') || error.message.toLowerCase().includes('email')) {
+                document.getElementById('email').style.border = '2px solid red';
+            } else if (error.message.toLowerCase().includes('contraseña') || error.message.toLowerCase().includes('password')) {
+                document.getElementById('password').style.border = '2px solid red';
+            }
+            setTimeout(() => {
+                registerMsg.textContent = '';
+                form.querySelectorAll('input, select').forEach(el => {
+                    el.style.border = '';
+                });
+            }, 2000);
         }
     });
 });
