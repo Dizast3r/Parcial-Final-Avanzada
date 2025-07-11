@@ -204,6 +204,36 @@ function mostrarResultadosBusqueda(videos, termino) {
     videosGrid.insertBefore(estadisticas, videosGrid.firstChild);
 }
 
+// Redirigir a suscripciones.html al hacer clic en "Suscripciones"
+const suscripcionesLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
+    .find(el => el.textContent.trim() === 'Suscripciones')?.parentElement;
+if (suscripcionesLink) {
+    suscripcionesLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'suscripciones.html';
+    });
+}
+
+// Redirigir a videos-que-me-gustan.html al hacer clic en "Videos que me gustan"
+const videosQueMeGustanLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
+    .find(el => el.textContent.trim() === 'Videos que me gustan')?.parentElement;
+if (videosQueMeGustanLink) {
+    videosQueMeGustanLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'videos-que-me-gustan.html';
+    });
+}
+
+// Redirigir a suscriptores.html al hacer clic en "Suscriptores"
+const suscriptoresLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
+    .find(el => el.textContent.trim() === 'Suscriptores')?.parentElement;
+if (suscriptoresLink) {
+    suscriptoresLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'suscriptores.html';
+    });
+}
+
 // Función para crear tarjeta de video (eliminada para evitar duplicación)
 // Se usa el código integrado en mostrarResultadosBusqueda
 
