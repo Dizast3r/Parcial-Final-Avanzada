@@ -63,16 +63,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mostrar nickname en el perfil
-    const userToken = localStorage.getItem('token');
-    let nickname = '';
-    if (localStorage.getItem('nickname')) {
-        nickname = localStorage.getItem('nickname');
-    } else if (userToken) {
-        // Si tienes un token JWT y el nickname está en el payload, puedes decodificarlo aquí
+    // Función para obtener datos del usuario desde localStorage
+    function obtenerDatosUsuario() {
+        try {
+            const usuarioData = localStorage.getItem('usuario');
+            if (usuarioData) {
+                const usuario = JSON.parse(usuarioData);
+                return {
+                    nickname: usuario.nickname || '',
+                    id: usuario.id || '',
+                    token: localStorage.getItem('token') || ''
+                };
+            }
+            
+            // Fallback para compatibilidad con versiones anteriores
+            return {
+                nickname: localStorage.getItem('nickname') || '',
+                id: localStorage.getItem('userId') || '',
+                token: localStorage.getItem('token') || ''
+            };
+        } catch (error) {
+            console.error('Error al obtener datos del usuario:', error);
+            return {
+                nickname: '',
+                id: '',
+                token: ''
+            };
+        }
     }
+
+    // Mostrar nickname en el perfil
+    const datosUsuario = obtenerDatosUsuario();
     if (profileNickname) {
-        profileNickname.textContent = nickname ? nickname : 'Invitado';
+        profileNickname.textContent = datosUsuario.nickname ? datosUsuario.nickname : 'Invitado';
     }
 
     // Cerrar sesión desde la barra lateral
@@ -84,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('token');
             localStorage.removeItem('nickname');
             localStorage.removeItem('userId');
+            localStorage.removeItem('usuario'); // Limpiar también el objeto usuario
             alert('Sesión cerrada correctamente.');
             window.location.href = 'login.html';
         });
@@ -170,6 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función mejorada para mostrar el modal de video estilo YouTube
     function mostrarModalVideo(url, titulo, videoData) {
+        const datosUsuario = obtenerDatosUsuario();
+        
         const overlay = document.createElement('div');
         overlay.className = 'video-modal-overlay';
         overlay.innerHTML = `
@@ -222,10 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                                 <div class="channel-details">
                                     <div class="channel-name">${videoData.usuario?.nickname || 'Usuario desconocido'}</div>
-                                    <div class="subscriber-count">0 suscriptores</div>
+                                    <div class="subscriber-count" id="subscriberCount">Cargando suscriptores...</div>
                                 </div>
-                                <button class="subscribe-btn" data-user-id="${videoData.usuario?.id || ''}">
-                                    SUSCRIBIRSE
+                                <button class="subscribe-btn" data-user-id="${videoData.usuario?.id || ''}" id="subscribeBtn">
+                                    <span class="subscribe-text">SUSCRIBIRSE</span>
                                 </button>
                             </div>
                             
@@ -248,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <!-- Formulario para agregar comentario -->
                         <div class="add-comment-section">
                             <div class="comment-avatar">
-                                <span class="avatar-icon">${localStorage.getItem('nickname')?.charAt(0).toUpperCase() || 'U'}</span>
+                                <span class="avatar-icon">${datosUsuario.nickname ? datosUsuario.nickname.charAt(0).toUpperCase() : 'U'}</span>
                             </div>
                             <div class="comment-input-container">
                                 <textarea 
@@ -280,6 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Cargar datos iniciales
         cargarLikesYDislikes(videoData.id);
         cargarComentarios(videoData.id);
+        cargarContadorSuscriptores(videoData.usuario?.id);
         verificarEstadoSuscripcion(videoData.usuario?.id);
     }
 
@@ -314,10 +341,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Subscribe button
-        overlay.querySelector('.subscribe-btn').addEventListener('click', (e) => {
+        overlay.querySelector('#subscribeBtn').addEventListener('click', (e) => {
             const usuarioId = e.target.dataset.userId;
             if (usuarioId) {
-                suscribirseAUsuario(usuarioId);
+                manejarSuscripcion(usuarioId);
             }
         });
         
@@ -349,6 +376,123 @@ document.addEventListener('DOMContentLoaded', () => {
                 overlay.querySelector('.comment-actions').style.opacity = '0';
             }
         });
+    }
+
+    // Función para cargar el contador de suscriptores
+    async function cargarContadorSuscriptores(usuarioId) {
+        try {
+            if (!usuarioId) return;
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioId}/suscriptores/count`);
+            if (response.ok) {
+                const count = await response.text();
+                const subscriberCountEl = document.getElementById('subscriberCount');
+                if (subscriberCountEl) {
+                    const numSuscriptores = parseInt(count);
+                    subscriberCountEl.textContent = `${numSuscriptores} ${numSuscriptores === 1 ? 'suscriptor' : 'suscriptores'}`;
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar contador de suscriptores:', error);
+            const subscriberCountEl = document.getElementById('subscriberCount');
+            if (subscriberCountEl) {
+                subscriberCountEl.textContent = '0 suscriptores';
+            }
+        }
+    }
+
+    // Función para manejar suscripción/desuscripción
+    async function manejarSuscripcion(usuarioSuscritoId) {
+        try {
+            const usuarioSuscriptorId = obtenerUsuarioIdActual();
+            if (!usuarioSuscriptorId) {
+                alert('Debes iniciar sesión para suscribirte');
+                return;
+            }
+            
+            if (usuarioSuscriptorId === usuarioSuscritoId) {
+                alert('No puedes suscribirte a ti mismo');
+                return;
+            }
+            
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const subscribeText = subscribeBtn.querySelector('.subscribe-text');
+            const isSubscribed = subscribeBtn.classList.contains('subscribed');
+            
+            if (isSubscribed) {
+                // Desuscribirse
+                const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/desuscribirse/${usuarioSuscritoId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    subscribeBtn.classList.remove('subscribed');
+                    subscribeText.textContent = 'SUSCRIBIRSE';
+                    subscribeBtn.disabled = false;
+                    
+                    // Actualizar contador
+                    cargarContadorSuscriptores(usuarioSuscritoId);
+                } else {
+                    const errorText = await response.text();
+                    alert('Error al desuscribirse: ' + errorText);
+                }
+            } else {
+                // Suscribirse
+                const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/suscribirse/${usuarioSuscritoId}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    subscribeBtn.classList.add('subscribed');
+                    subscribeText.textContent = 'DESUSCRIBIRSE';
+                    subscribeBtn.disabled = false;
+                    
+                    // Actualizar contador
+                    cargarContadorSuscriptores(usuarioSuscritoId);
+                } else {
+                    const errorText = await response.text();
+                    alert('Error al suscribirse: ' + errorText);
+                }
+            }
+        } catch (error) {
+            console.error('Error al manejar suscripción:', error);
+            alert('Error al procesar la suscripción');
+        }
+    }
+
+    // Función para verificar estado de suscripción
+    async function verificarEstadoSuscripcion(usuarioSuscritoId) {
+        try {
+            const usuarioSuscriptorId = obtenerUsuarioIdActual();
+            if (!usuarioSuscriptorId || !usuarioSuscritoId) return;
+            
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const subscribeText = subscribeBtn.querySelector('.subscribe-text');
+            
+            if (usuarioSuscriptorId === usuarioSuscritoId) {
+                // Si es el propio usuario, ocultar el botón de suscripción
+                if (subscribeBtn) {
+                    subscribeBtn.style.display = 'none';
+                }
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/esta-suscrito/${usuarioSuscritoId}`);
+            if (response.ok) {
+                const estaSuscrito = await response.json();
+                
+                if (estaSuscrito) {
+                    subscribeBtn.classList.add('subscribed');
+                    subscribeText.textContent = 'DESUSCRIBIRSE';
+                } else {
+                    subscribeBtn.classList.remove('subscribed');
+                    subscribeText.textContent = 'SUSCRIBIRSE';
+                }
+                subscribeBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error al verificar suscripción:', error);
+        }
     }
 
     // Función para dar like/dislike
@@ -457,74 +601,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para suscribirse a un usuario
-    async function suscribirseAUsuario(usuarioSuscritoId) {
-        try {
-            const usuarioSuscriptorId = obtenerUsuarioIdActual();
-            if (!usuarioSuscriptorId) {
-                alert('Debes iniciar sesión para suscribirte');
-                return;
-            }
-            
-            if (usuarioSuscriptorId === usuarioSuscritoId) {
-                alert('No puedes suscribirte a ti mismo');
-                return;
-            }
-            
-            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/suscribirse/${usuarioSuscritoId}`, {
-                method: 'POST'
-            });
-            
-            if (response.ok) {
-                const subscribeBtn = document.querySelector('.subscribe-btn');
-                if (subscribeBtn) {
-                    subscribeBtn.textContent = 'SUSCRITO';
-                    subscribeBtn.classList.add('subscribed');
-                    subscribeBtn.disabled = true;
-                }
-            } else {
-                const errorText = await response.text();
-                alert('Error al suscribirse: ' + errorText);
-            }
-        } catch (error) {
-            console.error('Error al suscribirse:', error);
-        }
-    }
-
-    // Función para verificar estado de suscripción
-    async function verificarEstadoSuscripcion(usuarioSuscritoId) {
-        try {
-            const usuarioSuscriptorId = obtenerUsuarioIdActual();
-            if (!usuarioSuscriptorId || !usuarioSuscritoId) return;
-            
-            if (usuarioSuscriptorId === usuarioSuscritoId) {
-                // Si es el propio usuario, ocultar el botón de suscripción
-                const subscribeBtn = document.querySelector('.subscribe-btn');
-                if (subscribeBtn) {
-                    subscribeBtn.style.display = 'none';
-                }
-                return;
-            }
-            
-            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/usuario/${usuarioSuscriptorId}/esta-suscrito/${usuarioSuscritoId}`);
-            const estaSuscrito = await response.json();
-            
-            if (estaSuscrito) {
-                const subscribeBtn = document.querySelector('.subscribe-btn');
-                if (subscribeBtn) {
-                    subscribeBtn.textContent = 'SUSCRITO';
-                    subscribeBtn.classList.add('subscribed');
-                    subscribeBtn.disabled = true;
-                }
-            }
-        } catch (error) {
-            console.error('Error al verificar suscripción:', error);
-        }
-    }
-
     // Función auxiliar para obtener el ID del usuario actual
     function obtenerUsuarioIdActual() {
-        return localStorage.getItem('userId');
+        const datosUsuario = obtenerDatosUsuario();
+        return datosUsuario.id || localStorage.getItem('userId');
     }
 
     // Función auxiliar para formatear fechas
