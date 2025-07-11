@@ -195,6 +195,34 @@ public class UsuarioService {
         }
         return usuarioRepository.findSuscriptoresByUsuarioId(usuarioId);
     }
+    
+    /**
+     * Obtiene el número total de suscripciones de un usuario.
+     * 
+     * @param usuarioId ID del usuario
+     * @return Número de usuarios a los que está suscrito
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    public long contarSuscripciones(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new EntityNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        return usuarioRepository.findSuscripcionesByUsuarioId(usuarioId).size();
+    }
+
+    /**
+     * Obtiene el número total de suscriptores de un usuario.
+     * 
+     * @param usuarioId ID del usuario
+     * @return Número de usuarios suscritos a este usuario
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    public long contarSuscriptores(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new EntityNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        return usuarioRepository.findSuscriptoresByUsuarioId(usuarioId).size();
+    }
 
     /**
      * Verifica si un usuario está suscrito a otro usuario.

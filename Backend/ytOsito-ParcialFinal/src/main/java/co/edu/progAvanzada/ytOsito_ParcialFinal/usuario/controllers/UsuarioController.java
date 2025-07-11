@@ -144,4 +144,28 @@ public class UsuarioController {
     public boolean estaSuscrito(@Valid @PathVariable Long suscriptorId, @Valid @PathVariable Long suscritoId) {
         return usuarioService.estaSuscrito(suscriptorId, suscritoId);
     }
+    
+    /**
+     * Obtiene el número total de suscripciones de un usuario.
+     * 
+     * @param usuarioId ID del usuario del que se quiere obtener el número de suscripciones
+     * @return Número de usuarios a los que está suscrito
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    @GetMapping("/{usuarioId}/suscripciones/count")
+    public long contarSuscripciones(@Valid @PathVariable Long usuarioId) {
+        return usuarioService.contarSuscripciones(usuarioId);
+    }
+
+    /**
+     * Obtiene el número total de suscriptores de un usuario.
+     * 
+     * @param usuarioId ID del usuario del que se quiere obtener el número de suscriptores
+     * @return Número de usuarios suscritos a este usuario
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    @GetMapping("/{usuarioId}/suscriptores/count")
+    public long contarSuscriptores(@Valid @PathVariable Long usuarioId) {
+        return usuarioService.contarSuscriptores(usuarioId);
+    }
 }
