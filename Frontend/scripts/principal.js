@@ -63,39 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Función para obtener datos del usuario desde localStorage
-    function obtenerDatosUsuario() {
-        try {
-            const usuarioData = localStorage.getItem('usuario');
-            if (usuarioData) {
-                const usuario = JSON.parse(usuarioData);
-                return {
-                    nickname: usuario.nickname || '',
-                    id: usuario.id || '',
-                    token: localStorage.getItem('token') || ''
-                };
-            }
-            
-            // Fallback para compatibilidad con versiones anteriores
-            return {
-                nickname: localStorage.getItem('nickname') || '',
-                id: localStorage.getItem('userId') || '',
-                token: localStorage.getItem('token') || ''
-            };
-        } catch (error) {
-            console.error('Error al obtener datos del usuario:', error);
-            return {
-                nickname: '',
-                id: '',
-                token: ''
-            };
-        }
-    }
-
     // Mostrar nickname en el perfil
-    const datosUsuario = obtenerDatosUsuario();
+    const userToken = localStorage.getItem('token');
+    let nickname = '';
+    if (localStorage.getItem('nickname')) {
+        nickname = localStorage.getItem('nickname');
+    } else if (userToken) {
+        // Si tienes un token JWT y el nickname está en el payload, puedes decodificarlo aquí
+    }
     if (profileNickname) {
-        profileNickname.textContent = datosUsuario.nickname ? datosUsuario.nickname : 'Invitado';
+        profileNickname.textContent = nickname ? nickname : 'Invitado';
     }
 
     // Cerrar sesión desde la barra lateral
@@ -107,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('token');
             localStorage.removeItem('nickname');
             localStorage.removeItem('userId');
-            localStorage.removeItem('usuario'); // Limpiar también el objeto usuario
             alert('Sesión cerrada correctamente.');
             window.location.href = 'login.html';
         });
@@ -194,8 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función mejorada para mostrar el modal de video estilo YouTube
     function mostrarModalVideo(url, titulo, videoData) {
-        const datosUsuario = obtenerDatosUsuario();
-        
         const overlay = document.createElement('div');
         overlay.className = 'video-modal-overlay';
         overlay.innerHTML = `
@@ -274,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <!-- Formulario para agregar comentario -->
                         <div class="add-comment-section">
                             <div class="comment-avatar">
-                                <span class="avatar-icon">${datosUsuario.nickname ? datosUsuario.nickname.charAt(0).toUpperCase() : 'U'}</span>
+                                <span class="avatar-icon">${localStorage.getItem('nickname')?.charAt(0).toUpperCase() || 'U'}</span>
                             </div>
                             <div class="comment-input-container">
                                 <textarea 
@@ -603,8 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función auxiliar para obtener el ID del usuario actual
     function obtenerUsuarioIdActual() {
-        const datosUsuario = obtenerDatosUsuario();
-        return datosUsuario.id || localStorage.getItem('userId');
+        return localStorage.getItem('userId');
     }
 
     // Función auxiliar para formatear fechas
@@ -628,51 +601,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los videos al inicio
     cargarVideos();
-
-    // Lógica para el botón hamburguesa que minimiza/expande la barra lateral y el contenido principal
-    let myHamburgerBtn = document.getElementById('hamburgerBtn');
-    if (!myHamburgerBtn) {
-        myHamburgerBtn = document.createElement('button');
-        myHamburgerBtn.id = 'hamburgerBtn';
-        myHamburgerBtn.setAttribute('aria-label', 'Mostrar/ocultar barra lateral');
-        myHamburgerBtn.className = 'hamburger-btn';
-        myHamburgerBtn.innerHTML = `
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect y="7" width="32" height="3.5" rx="1.5" fill="#fff"/>
-                <rect y="14" width="32" height="3.5" rx="1.5" fill="#fff"/>
-                <rect y="21" width="32" height="3.5" rx="1.5" fill="#fff"/>
-            </svg>
-        `;
-        // Insertar en la barra superior si existe
-        const navbarLeft = document.querySelector('.navbar-left');
-        if (navbarLeft) {
-            navbarLeft.insertBefore(myHamburgerBtn, navbarLeft.firstChild);
-        } else {
-            document.body.insertBefore(myHamburgerBtn, document.body.firstChild);
-        }
-    } else {
-        // Si ya existe, asegúrate de que tenga el SVG correcto
-        myHamburgerBtn.innerHTML = `
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect y="7" width="32" height="3.5" rx="1.5" fill="#fff"/>
-                <rect y="14" width="32" height="3.5" rx="1.5" fill="#fff"/>
-                <rect y="21" width="32" height="3.5" rx="1.5" fill="#fff"/>
-            </svg>
-        `;
-        myHamburgerBtn.className = 'hamburger-btn';
-    }
-
-    // Sincronizar SIEMPRE el estado de barra lateral y contenido
-    myHamburgerBtn.addEventListener('click', () => {
-        if (barralateral && contenidoPrincipal) {
-            const isMini = barralateral.classList.contains('mini');
-            if (isMini) {
-                barralateral.classList.remove('mini');
-                contenidoPrincipal.classList.remove('mini-sidebar');
-            } else {
-                barralateral.classList.add('mini');
-                contenidoPrincipal.classList.add('mini-sidebar');
-            }
-        }
-    });
 });
