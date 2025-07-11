@@ -31,6 +31,309 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+
+
+// Variables para la búsqueda
+let todosLosVideos = []; // Cache de todos los videos
+let busquedaTimeout; // Para debounce de la búsqueda
+
+// Función para inicializar la búsqueda
+function inicializarBusqueda() {
+    const buscarInput = document.querySelector('.buscar-input');
+    const buscarBtn = document.querySelector('.buscar-btn');
+    
+    if (buscarInput) {
+        // Búsqueda en tiempo real con debounce
+        buscarInput.addEventListener('input', (e) => {
+            clearTimeout(busquedaTimeout);
+            const termino = e.target.value.trim();
+            
+            // Debounce de 300ms para evitar muchas búsquedas
+            busquedaTimeout = setTimeout(() => {
+                if (termino.length >= 2) {
+                    buscarVideos(termino);
+                } else if (termino.length === 0) {
+                    mostrarTodosLosVideos();
+                }
+            }, 300);
+        });
+        
+        // Búsqueda al presionar Enter
+        buscarInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const termino = e.target.value.trim();
+                if (termino.length >= 1) {
+                    buscarVideos(termino);
+                }
+            }
+        });
+    }
+    
+    if (buscarBtn) {
+        // Búsqueda al hacer clic en el botón
+        buscarBtn.addEventListener('click', () => {
+            const termino = buscarInput.value.trim();
+            if (termino.length >= 1) {
+                buscarVideos(termino);
+            }
+        });
+    }
+}
+
+// Función para buscar videos
+async function buscarVideos(termino) {
+    try {
+        // Mostrar indicador de carga
+        mostrarIndicadorCarga();
+        
+        const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/buscar?titulo=${encodeURIComponent(termino)}`);
+        
+        if (!response.ok) {
+            throw new Error('Error en la búsqueda');
+        }
+        
+        const videos = await response.json();
+        console.log('Resultados de búsqueda:', videos);
+        
+        // Mostrar resultados
+        mostrarResultadosBusqueda(videos, termino);
+        
+    } catch (error) {
+        console.error('Error al buscar videos:', error);
+        mostrarErrorBusqueda(error.message);
+    }
+}
+
+// Función para mostrar resultados de búsqueda
+function mostrarResultadosBusqueda(videos, termino) {
+    const videosGrid = document.getElementById('videosGrid');
+    const contenidoPrincipal = document.getElementById('contenidoPrincipal');
+    
+    // Actualizar el título para mostrar que es una búsqueda
+    const titulo = contenidoPrincipal.querySelector('h1');
+    if (titulo) {
+        titulo.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span>Resultados para "${termino}"</span>
+                <button class="limpiar-busqueda-btn" onclick="limpiarBusqueda()" style="
+                    background: #ff4444;
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                    transition: background 0.2s;
+                " onmouseover="this.style.background='#ff6666'" onmouseout="this.style.background='#ff4444'">
+                    Limpiar búsqueda
+                </button>
+            </div>
+        `;
+    }
+    
+    if (!Array.isArray(videos) || videos.length === 0) {
+        videosGrid.innerHTML = `
+            <div style="
+                color: #fff;
+                font-size: 1.2rem;
+                text-align: center;
+                padding: 2rem;
+                background: #2a2a2a;
+                border-radius: 10px;
+                margin: 2rem 0;
+            ">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                <div>No se encontraron videos para "${termino}"</div>
+                <div style="font-size: 1rem; color: #aaa; margin-top: 0.5rem;">
+                    Intenta con otros términos de búsqueda
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Cargar videos encontrados usando la función existente
+    videosGrid.innerHTML = '';
+    videos.forEach(video => {
+        console.log('Procesando video de búsqueda:', video);
+        
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        
+        const descripcion = video.Descripcion || video.descripcion || 'Sin descripción';
+        const titulo = video.titulo || 'Sin título';
+        const vistas = video.vistas || 0;
+        const nickname = video.usuario?.nickname || 'Desconocido';
+        const miniatura = video.miniatura_src || '';
+        const videoSrc = video.video_src || '';
+        
+        card.innerHTML = `
+            <img class="video-thumb" src="${miniatura}" alt="Miniatura" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjM0YzRjNGIi8+CjxwYXRoIGQ9Ik0xMzUgNzBMMTc1IDkwTDEzNSAxMTBWNzBaIiBmaWxsPSIjN0Y3RjdGIi8+Cjwvc3ZnPg=='">
+            <div class="video-card-content">
+                <div class="video-title">${titulo}</div>
+                <div class="video-desc">${descripcion}</div>
+                <div class="video-meta">
+                    <span>👁️ ${vistas} vistas</span>
+                    <span>🎬 ${nickname}</span>
+                </div>
+            </div>
+        `;
+        
+        // Al hacer click en la miniatura, mostrar el video en grande
+        card.querySelector('.video-thumb').addEventListener('click', () => {
+            if (videoSrc) {
+                mostrarModalVideo(videoSrc, titulo, video);
+                incrementarVistas(video.id);
+            }
+        });
+        
+        videosGrid.appendChild(card);
+    });
+    
+    // Mostrar estadísticas de búsqueda
+    const estadisticas = document.createElement('div');
+    estadisticas.style.cssText = `
+        color: #aaa;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #333;
+    `;
+    estadisticas.textContent = `Se encontraron ${videos.length} ${videos.length === 1 ? 'video' : 'videos'}`;
+    videosGrid.insertBefore(estadisticas, videosGrid.firstChild);
+}
+
+// Función para crear tarjeta de video (eliminada para evitar duplicación)
+// Se usa el código integrado en mostrarResultadosBusqueda
+
+// Función para mostrar indicador de carga
+function mostrarIndicadorCarga() {
+    const videosGrid = document.getElementById('videosGrid');
+    videosGrid.innerHTML = `
+        <div style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            color: #fff;
+            font-size: 1.1rem;
+        ">
+            <div style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            ">
+                <div class="loader" style="
+                    width: 40px;
+                    height: 40px;
+                    border: 4px solid #333;
+                    border-top: 4px solid #ff0000;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                "></div>
+                <span>Buscando videos...</span>
+            </div>
+        </div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    `;
+}
+
+// Función para mostrar error de búsqueda
+function mostrarErrorBusqueda(mensaje) {
+    const videosGrid = document.getElementById('videosGrid');
+    videosGrid.innerHTML = `
+        <div style="
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 2rem;
+            background: #ff4444;
+            border-radius: 10px;
+            margin: 2rem 0;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+            <div>Error al buscar videos</div>
+            <div style="font-size: 1rem; color: #ffcccc; margin-top: 0.5rem;">
+                ${mensaje}
+            </div>
+            <button onclick="mostrarTodosLosVideos()" style="
+                background: #fff;
+                color: #ff4444;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                cursor: pointer;
+                margin-top: 1rem;
+                font-weight: bold;
+            ">
+                Volver a todos los videos
+            </button>
+        </div>
+    `;
+}
+
+// Función para limpiar búsqueda
+function limpiarBusqueda() {
+    const buscarInput = document.querySelector('.buscar-input');
+    if (buscarInput) {
+        buscarInput.value = '';
+    }
+    mostrarTodosLosVideos();
+}
+
+// Función para mostrar todos los videos
+function mostrarTodosLosVideos() {
+    const contenidoPrincipal = document.getElementById('contenidoPrincipal');
+    const titulo = contenidoPrincipal.querySelector('h1');
+    if (titulo) {
+        titulo.innerHTML = 'Videos';
+    }
+    
+    // Recargar todos los videos
+    cargarVideos();
+}
+
+// Función para resaltar términos de búsqueda (opcional)
+function resaltarTermino(texto, termino) {
+    if (!termino || termino.length < 2) return texto;
+    
+    const regex = new RegExp(`(${termino})`, 'gi');
+    return texto.replace(regex, '<mark style="background: #ffff00; color: #000; padding: 0 2px;">$1</mark>');
+}
+
+// Función para obtener sugerencias de búsqueda (opcional)
+async function obtenerSugerencias(termino) {
+    try {
+        // Filtrar videos locales para sugerencias rápidas
+        if (todosLosVideos.length > 0) {
+            const sugerencias = todosLosVideos
+                .filter(video => 
+                    video.titulo?.toLowerCase().includes(termino.toLowerCase()) ||
+                    video.usuario?.nickname?.toLowerCase().includes(termino.toLowerCase())
+                )
+                .slice(0, 5)
+                .map(video => ({
+                    tipo: 'video',
+                    texto: video.titulo,
+                    canal: video.usuario?.nickname
+                }));
+            
+            return sugerencias;
+        }
+        return [];
+    } catch (error) {
+        console.error('Error al obtener sugerencias:', error);
+        return [];
+    }
+}
+
     hamburgerBtn.addEventListener('click', toggleSidebar);
     sidebarToggleBtn.addEventListener('click', toggleSidebar);
 
@@ -120,36 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
         misVideosLink.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'canal.html';
-        });
-    }
-
-    // Redirigir a suscripciones.html al hacer clic en "Suscripciones"
-    const suscripcionesLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
-        .find(el => el.textContent.trim() === 'Suscripciones')?.parentElement;
-    if (suscripcionesLink) {
-        suscripcionesLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'suscripciones.html';
-        });
-    }
-
-    // Redirigir a suscriptores.html al hacer clic en "Suscriptores"
-    const suscriptoresLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
-        .find(el => el.textContent.trim() === 'Suscriptores')?.parentElement;
-    if (suscriptoresLink) {
-        suscriptoresLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'suscriptores.html';
-        });
-    }
-
-    // Redirigir a videos-que-me-gustan.html al hacer clic en "Videos que me gustan"
-    const videosQueMeGustanLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
-        .find(el => el.textContent.trim() === 'Videos que me gustan')?.parentElement;
-    if (videosQueMeGustanLink) {
-        videosQueMeGustanLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'videos-que-me-gustan.html';
         });
     }
 
@@ -575,12 +848,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const commentsList = document.getElementById('commentsList');
             const commentsCount = document.getElementById('commentsCount');
+            const usuarioActualId = obtenerUsuarioIdActual();
             
             if (commentsCount) commentsCount.textContent = comentarios.length;
             
             if (commentsList) {
                 commentsList.innerHTML = comentarios.map(comentario => `
-                    <div class="comment-item">
+                    <div class="comment-item" data-comment-id="${comentario.id}">
                         <div class="comment-avatar">
                             <span class="avatar-icon">${comentario.usuario?.nickname?.charAt(0).toUpperCase() || 'U'}</span>
                         </div>
@@ -588,14 +862,62 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="comment-header">
                                 <span class="comment-author">${comentario.usuario?.nickname || 'Usuario'}</span>
                                 <span class="comment-date">${formatearFecha(comentario.fechaDeCreacion)}</span>
+                                ${comentario.usuario?.id == usuarioActualId ? `
+                                    <button class="delete-comment-btn" data-comment-id="${comentario.id}" title="Eliminar comentario">
+                                        <svg viewBox="0 0 24 24" width="16" height="16">
+                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                    </button>
+                                ` : ''}
                             </div>
                             <div class="comment-text">${comentario.comentario}</div>
                         </div>
                     </div>
                 `).join('');
+                
+                // Agregar event listeners a los botones de eliminar
+                const deleteButtons = commentsList.querySelectorAll('.delete-comment-btn');
+                deleteButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const comentarioId = btn.dataset.commentId;
+                        eliminarComentario(comentarioId, videoId);
+                    });
+                });
             }
         } catch (error) {
             console.error('Error al cargar comentarios:', error);
+        }
+    }
+
+    // Función para eliminar comentario
+    async function eliminarComentario(comentarioId, videoId) {
+        try {
+            const usuarioId = obtenerUsuarioIdActual();
+            if (!usuarioId) {
+                alert('Debes iniciar sesión para eliminar comentarios');
+                return;
+            }
+            
+            // Confirmar eliminación
+            if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+                return;
+            }
+            
+            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/${comentarioId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                // Recargar comentarios después de eliminar
+                cargarComentarios(videoId);
+            } else {
+                const errorText = await response.text();
+                alert('Error al eliminar comentario: ' + errorText);
+            }
+        } catch (error) {
+            console.error('Error al eliminar comentario:', error);
+            alert('Error al eliminar comentario');
         }
     }
 
@@ -637,102 +959,62 @@ document.addEventListener('DOMContentLoaded', () => {
         return datosUsuario.id || localStorage.getItem('userId');
     }
 
-    // Función auxiliar para formatear fechas
     function formatearFecha(fechaString) {
+    try {
+        // Crear objeto Date desde el string
         const fecha = new Date(fechaString);
         const ahora = new Date();
-        const diferencia = ahora - fecha;
         
-        const minutos = Math.floor(diferencia / (1000 * 60));
-        const horas = Math.floor(diferencia / (1000 * 60 * 60));
-        const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-        
-        if (minutos < 60) {
-            return `hace ${minutos} minutos`;
-        } else if (horas < 24) {
-            return `hace ${horas} horas`;
-        } else {
-            return `hace ${dias} días`;
+        // Verificar que la fecha sea válida
+        if (isNaN(fecha.getTime())) {
+            return 'Fecha inválida';
         }
+        
+        // Calcular diferencia en milisegundos
+        const diferencia = ahora.getTime() - fecha.getTime();
+        
+        // Si la diferencia es negativa, la fecha es en el futuro
+        if (diferencia < 0) {
+            return 'Justo ahora';
+        }
+        
+        // Convertir a diferentes unidades
+        const segundos = Math.floor(diferencia / 1000);
+        const minutos = Math.floor(segundos / 60);
+        const horas = Math.floor(minutos / 60);
+        const dias = Math.floor(horas / 24);
+        const semanas = Math.floor(dias / 7);
+        const meses = Math.floor(dias / 30);
+        const años = Math.floor(dias / 365);
+        
+        // Retornar el formato apropiado
+        if (segundos < 60) {
+            return 'Justo ahora';
+        } else if (minutos < 60) {
+            return `hace ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+        } else if (horas < 24) {
+            return `hace ${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+        } else if (dias < 7) {
+            return `hace ${dias} ${dias === 1 ? 'día' : 'días'}`;
+        } else if (semanas < 4) {
+            return `hace ${semanas} ${semanas === 1 ? 'semana' : 'semanas'}`;
+        } else if (meses < 12) {
+            return `hace ${meses} ${meses === 1 ? 'mes' : 'meses'}`;
+        } else {
+            return `hace ${años} ${años === 1 ? 'año' : 'años'}`;
+        }
+    } catch (error) {
+        console.error('Error al formatear fecha:', error);
+        return 'Fecha inválida';
     }
+}
+
+    window.limpiarBusqueda = limpiarBusqueda;
+window.mostrarTodosLosVideos = mostrarTodosLosVideos;
 
     // Cargar los videos al inicio
     cargarVideos();
-
-    // Lógica para el botón hamburguesa que minimiza/expande la barra lateral y el contenido principal
-    let myHamburgerBtn = document.getElementById('hamburgerBtn');
-    if (!myHamburgerBtn) {
-        myHamburgerBtn = document.createElement('button');
-        myHamburgerBtn.id = 'hamburgerBtn';
-        myHamburgerBtn.setAttribute('aria-label', 'Mostrar menú');
-        myHamburgerBtn.className = 'hamburger-btn';
-        myHamburgerBtn.innerHTML = `
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        `;
-        // Insertar en la barra superior derecha
-        let navbarRight = document.querySelector('.navbar-right');
-        if (!navbarRight) {
-            navbarRight = document.createElement('div');
-            navbarRight.className = 'navbar-right';
-            // Insertar navbarRight en la barra superior si existe
-            const navbar = document.querySelector('.navbar');
-            if (navbar) {
-                navbar.appendChild(navbarRight);
-            } else {
-                document.body.insertBefore(navbarRight, document.body.firstChild);
-            }
-        }
-        navbarRight.appendChild(myHamburgerBtn);
-    } else {
-        // Si ya existe, asegúrate de que tenga el HTML correcto
-        myHamburgerBtn.innerHTML = `
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        `;
-        myHamburgerBtn.className = 'hamburger-btn';
-    }
-
-    // Crear menú desplegable si no existe
-    let menuDropdown = document.getElementById('menuDropdown');
-    if (!menuDropdown) {
-        menuDropdown = document.createElement('div');
-        menuDropdown.id = 'menuDropdown';
-        menuDropdown.className = 'menu-dropdown';
-        menuDropdown.style.display = 'none';
-        menuDropdown.innerHTML = `
-            <ul>
-                <li id="menuInicio">Volver a inicio</li>
-                <li id="menuCerrarSesion">Cerrar sesión</li>
-            </ul>
-        `;
-        myHamburgerBtn.parentElement.appendChild(menuDropdown);
-    }
-
-    // Mostrar/ocultar menú al hacer click en el botón hamburguesa
-    myHamburgerBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
-    });
-    // Ocultar menú si se hace click fuera
-    document.addEventListener('click', (e) => {
-        if (menuDropdown.style.display === 'block' && !menuDropdown.contains(e.target) && e.target !== myHamburgerBtn) {
-            menuDropdown.style.display = 'none';
-        }
-    });
-    // Acción para "Volver a inicio"
-    document.getElementById('menuInicio').onclick = () => {
-        window.location.href = 'principal.html';
-    };
-    // Acción para "Cerrar sesión"
-    document.getElementById('menuCerrarSesion').onclick = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('nickname');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('usuario');
-        alert('Sesión cerrada correctamente.');
-        window.location.href = 'login.html';
-    };
+    
+    // Inicializar funcionalidad de búsqueda
+    inicializarBusqueda();
 });
