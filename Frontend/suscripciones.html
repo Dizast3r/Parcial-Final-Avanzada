@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suscripciones - Ositube</title>
+    <link rel="stylesheet" href="styles/principal.css">
+    <link rel="stylesheet" href="styles/suscripciones.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <span class="logo" style="color:#fff;">YouTube Osito</span>
+        </div>
+        <div class="navbar-right">
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menú">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect y="7" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                    <rect y="14" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                    <rect y="21" width="32" height="3.5" rx="1.5" fill="#fff"/>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="menu-dropdown">
+                <button id="goInicio">Volver a inicio</button>
+                <button id="cerrarSesion">Cerrar sesión</button>
+            </div>
+        </div>
+    </nav>
+    <main class="contenido-suscripciones">
+        <h1 class="titulo-suscripciones">Canales que sigues</h1>
+        <div id="canalesBar" class="canales-bar"></div>
+        <div id="canalesContent" class="canales-content"></div>
+    </main>
+    <script src="scripts/suscripciones.js"></script>
+</body>
+</html>

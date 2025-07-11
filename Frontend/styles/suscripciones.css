@@ -1,0 +1,145 @@
+body {
+    background: #0f0f0f;
+    color: #fff;
+    margin: 0;
+    font-family: 'Roboto', 'Arial', sans-serif;
+}
+
+.navbar {
+    width: 100vw;
+    height: 56px;
+    background: #181818;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #333;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-right: 24px;
+}
+
+.hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+}
+
+.menu-dropdown {
+    display: none;
+    position: absolute;
+    top: 56px;
+    right: 0;
+    background: #222;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    flex-direction: column;
+    min-width: 160px;
+    z-index: 1100;
+}
+.menu-dropdown.show {
+    display: flex;
+}
+.menu-dropdown button {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 12px 20px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s;
+}
+.menu-dropdown button:hover {
+    background: #333;
+}
+
+.contenido-suscripciones {
+    margin-top: 80px;
+    padding: 24px;
+}
+.titulo-suscripciones {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    color: #fff;
+}
+.canales-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-x: unset;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+    width: 100%;
+    max-width: 400px;
+}
+.canal-col-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #181818;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.canal-col-item:hover {
+    background: #222;
+}
+.canal-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+    border: 2px solid #7614a3;
+    cursor: pointer;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.canal-avatar.selected, .canal-avatar:hover {
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #fff2;
+}
+.canal-nickname {
+    text-align: center;
+    font-size: 1rem;
+    margin-top: 8px;
+    color: #fff;
+}
+.canal-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+.canales-content {
+    margin-top: 32px;
+}
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+.videos-canal-columna {
+    margin-left: 48px;
+    margin-bottom: 16px;
+}

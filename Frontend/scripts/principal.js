@@ -123,6 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Redirigir a suscripciones.html al hacer clic en "Suscripciones"
+    const suscripcionesLink = Array.from(document.querySelectorAll('.barralateral-item .text'))
+        .find(el => el.textContent.trim() === 'Suscripciones')?.parentElement;
+    if (suscripcionesLink) {
+        suscripcionesLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'suscripciones.html';
+        });
+    }
+
     // Cargar todos los videos publicados usando el endpoint correcto /video/todos
     async function cargarVideos() {
         try {
@@ -545,13 +555,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const commentsList = document.getElementById('commentsList');
             const commentsCount = document.getElementById('commentsCount');
-            const usuarioActualId = obtenerUsuarioIdActual();
             
             if (commentsCount) commentsCount.textContent = comentarios.length;
             
             if (commentsList) {
                 commentsList.innerHTML = comentarios.map(comentario => `
-                    <div class="comment-item" data-comment-id="${comentario.id}">
+                    <div class="comment-item">
                         <div class="comment-avatar">
                             <span class="avatar-icon">${comentario.usuario?.nickname?.charAt(0).toUpperCase() || 'U'}</span>
                         </div>
@@ -559,62 +568,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="comment-header">
                                 <span class="comment-author">${comentario.usuario?.nickname || 'Usuario'}</span>
                                 <span class="comment-date">${formatearFecha(comentario.fechaDeCreacion)}</span>
-                                ${comentario.usuario?.id == usuarioActualId ? `
-                                    <button class="delete-comment-btn" data-comment-id="${comentario.id}" title="Eliminar comentario">
-                                        <svg viewBox="0 0 24 24" width="16" height="16">
-                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                        </svg>
-                                    </button>
-                                ` : ''}
                             </div>
                             <div class="comment-text">${comentario.comentario}</div>
                         </div>
                     </div>
                 `).join('');
-                
-                // Agregar event listeners a los botones de eliminar
-                const deleteButtons = commentsList.querySelectorAll('.delete-comment-btn');
-                deleteButtons.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const comentarioId = btn.dataset.commentId;
-                        eliminarComentario(comentarioId, videoId);
-                    });
-                });
             }
         } catch (error) {
             console.error('Error al cargar comentarios:', error);
-        }
-    }
-
-    // Función para eliminar comentario
-    async function eliminarComentario(comentarioId, videoId) {
-        try {
-            const usuarioId = obtenerUsuarioIdActual();
-            if (!usuarioId) {
-                alert('Debes iniciar sesión para eliminar comentarios');
-                return;
-            }
-            
-            // Confirmar eliminación
-            if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
-                return;
-            }
-            
-            const response = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/comentario/${comentarioId}`, {
-                method: 'DELETE'
-            });
-            
-            if (response.ok) {
-                // Recargar comentarios después de eliminar
-                cargarComentarios(videoId);
-            } else {
-                const errorText = await response.text();
-                alert('Error al eliminar comentario: ' + errorText);
-            }
-        } catch (error) {
-            console.error('Error al eliminar comentario:', error);
-            alert('Error al eliminar comentario');
         }
     }
 
@@ -656,56 +617,102 @@ document.addEventListener('DOMContentLoaded', () => {
         return datosUsuario.id || localStorage.getItem('userId');
     }
 
+    // Función auxiliar para formatear fechas
     function formatearFecha(fechaString) {
-    try {
-        // Crear objeto Date desde el string
         const fecha = new Date(fechaString);
         const ahora = new Date();
+        const diferencia = ahora - fecha;
         
-        // Verificar que la fecha sea válida
-        if (isNaN(fecha.getTime())) {
-            return 'Fecha inválida';
-        }
+        const minutos = Math.floor(diferencia / (1000 * 60));
+        const horas = Math.floor(diferencia / (1000 * 60 * 60));
+        const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
         
-        // Calcular diferencia en milisegundos
-        const diferencia = ahora.getTime() - fecha.getTime();
-        
-        // Si la diferencia es negativa, la fecha es en el futuro
-        if (diferencia < 0) {
-            return 'Justo ahora';
-        }
-        
-        // Convertir a diferentes unidades
-        const segundos = Math.floor(diferencia / 1000);
-        const minutos = Math.floor(segundos / 60);
-        const horas = Math.floor(minutos / 60);
-        const dias = Math.floor(horas / 24);
-        const semanas = Math.floor(dias / 7);
-        const meses = Math.floor(dias / 30);
-        const años = Math.floor(dias / 365);
-        
-        // Retornar el formato apropiado
-        if (segundos < 60) {
-            return 'Justo ahora';
-        } else if (minutos < 60) {
-            return `hace ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+        if (minutos < 60) {
+            return `hace ${minutos} minutos`;
         } else if (horas < 24) {
-            return `hace ${horas} ${horas === 1 ? 'hora' : 'horas'}`;
-        } else if (dias < 7) {
-            return `hace ${dias} ${dias === 1 ? 'día' : 'días'}`;
-        } else if (semanas < 4) {
-            return `hace ${semanas} ${semanas === 1 ? 'semana' : 'semanas'}`;
-        } else if (meses < 12) {
-            return `hace ${meses} ${meses === 1 ? 'mes' : 'meses'}`;
+            return `hace ${horas} horas`;
         } else {
-            return `hace ${años} ${años === 1 ? 'año' : 'años'}`;
+            return `hace ${dias} días`;
         }
-    } catch (error) {
-        console.error('Error al formatear fecha:', error);
-        return 'Fecha inválida';
     }
-}
 
     // Cargar los videos al inicio
     cargarVideos();
+
+    // Lógica para el botón hamburguesa que minimiza/expande la barra lateral y el contenido principal
+    let myHamburgerBtn = document.getElementById('hamburgerBtn');
+    if (!myHamburgerBtn) {
+        myHamburgerBtn = document.createElement('button');
+        myHamburgerBtn.id = 'hamburgerBtn';
+        myHamburgerBtn.setAttribute('aria-label', 'Mostrar menú');
+        myHamburgerBtn.className = 'hamburger-btn';
+        myHamburgerBtn.innerHTML = `
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        `;
+        // Insertar en la barra superior derecha
+        let navbarRight = document.querySelector('.navbar-right');
+        if (!navbarRight) {
+            navbarRight = document.createElement('div');
+            navbarRight.className = 'navbar-right';
+            // Insertar navbarRight en la barra superior si existe
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.appendChild(navbarRight);
+            } else {
+                document.body.insertBefore(navbarRight, document.body.firstChild);
+            }
+        }
+        navbarRight.appendChild(myHamburgerBtn);
+    } else {
+        // Si ya existe, asegúrate de que tenga el HTML correcto
+        myHamburgerBtn.innerHTML = `
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        `;
+        myHamburgerBtn.className = 'hamburger-btn';
+    }
+
+    // Crear menú desplegable si no existe
+    let menuDropdown = document.getElementById('menuDropdown');
+    if (!menuDropdown) {
+        menuDropdown = document.createElement('div');
+        menuDropdown.id = 'menuDropdown';
+        menuDropdown.className = 'menu-dropdown';
+        menuDropdown.style.display = 'none';
+        menuDropdown.innerHTML = `
+            <ul>
+                <li id="menuInicio">Volver a inicio</li>
+                <li id="menuCerrarSesion">Cerrar sesión</li>
+            </ul>
+        `;
+        myHamburgerBtn.parentElement.appendChild(menuDropdown);
+    }
+
+    // Mostrar/ocultar menú al hacer click en el botón hamburguesa
+    myHamburgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    // Ocultar menú si se hace click fuera
+    document.addEventListener('click', (e) => {
+        if (menuDropdown.style.display === 'block' && !menuDropdown.contains(e.target) && e.target !== myHamburgerBtn) {
+            menuDropdown.style.display = 'none';
+        }
+    });
+    // Acción para "Volver a inicio"
+    document.getElementById('menuInicio').onclick = () => {
+        window.location.href = 'principal.html';
+    };
+    // Acción para "Cerrar sesión"
+    document.getElementById('menuCerrarSesion').onclick = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('nickname');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('usuario');
+        alert('Sesión cerrada correctamente.');
+        window.location.href = 'login.html';
+    };
 });
