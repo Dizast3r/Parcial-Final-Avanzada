@@ -60,39 +60,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="canal-avatar" data-idx="${idx}">${canal.nickname.charAt(0).toUpperCase()}</div>
                 <div class="canal-nickname">${canal.nickname}</div>
             `;
-            canalDiv.addEventListener('click', () => mostrarVideosCanalColumna(idx, canalDiv));
+            canalDiv.addEventListener('click', () => mostrarVideosCanalFila(idx, canalDiv));
             canalesBar.appendChild(canalDiv);
         });
     }
 
-    // Al hacer click en un canal, muestra los videos debajo de ese canal
-    async function mostrarVideosCanalColumna(idx, canalDiv) {
-        // Quitar videos previos
-        document.querySelectorAll('.videos-canal-columna').forEach(el => el.remove());
+    // Mostrar videos debajo de la barra, ocupando todo el ancho
+    async function mostrarVideosCanalFila(idx, canalDiv) {
+        canalesContent.innerHTML = '';
+        document.querySelectorAll('.canal-avatar').forEach(el => el.classList.remove('selected'));
+        canalDiv.querySelector('.canal-avatar').classList.add('selected');
         const canal = canales[idx];
         try {
             const res = await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/usuario/${canal.id}`);
             const videos = await res.json();
+            console.log(`Videos recibidos para canal ${canal.nickname} (ID: ${canal.id}):`, videos); // DEBUG
             const videosDiv = document.createElement('div');
             videosDiv.className = 'videos-canal-columna';
-            if (!Array.isArray(videos) || videos.length === 0) {
-                videosDiv.innerHTML = `<div style='color:#fff;'>${canal.nickname} no tiene videos.</div>`;
-            } else {
+            if (Array.isArray(videos) && videos.length > 0) {
                 videosDiv.innerHTML = videos.map(video => `
-                    <div class='video-card' style='margin: 16px 0;'>
-                        <img class='video-thumb' src='${video.miniatura_src || ''}' alt='Miniatura' style='width:160px;height:90px;object-fit:cover;border-radius:8px;margin-right:12px;vertical-align:middle;'/>
+                    <div class='video-card' style='margin: 16px 0; display: flex; align-items: center; gap: 1rem; cursor: pointer;'>
+                        <img class='video-thumb' src='${video.miniatura_src || ''}' alt='Miniatura' style='width:160px;height:90px;object-fit:cover;border-radius:8px;'/>
                         <span style='font-size:1.1rem;color:#fff;'>${video.titulo || 'Sin título'}</span>
                     </div>
                 `).join('');
-                // Puedes agregar aquí lógica para mostrar el video en modal si lo deseas
+                Array.from(videosDiv.querySelectorAll('.video-card')).forEach((card, i) => {
+                    card.addEventListener('click', () => {
+                        const video = videos[i];
+                        mostrarModalVideo(
+                            video.video_src || '',
+                            video.titulo || 'Sin título',
+                            video,
+                            canal
+                        );
+                        incrementarVistas(video.id);
+                    });
+                });
+            } else {
+                videosDiv.innerHTML = `<div style='color:#fff;'>${canal.nickname} no tiene videos.</div>`;
             }
-            canalDiv.insertAdjacentElement('afterend', videosDiv);
+            canalesContent.appendChild(videosDiv);
         } catch (e) {
             const videosDiv = document.createElement('div');
             videosDiv.className = 'videos-canal-columna';
             videosDiv.innerHTML = `<div style='color:#fff;'>No se pudieron cargar los videos.</div>`;
-            canalDiv.insertAdjacentElement('afterend', videosDiv);
+            canalesContent.appendChild(videosDiv);
         }
+    }
+
+    // --- Modal igual que en videos que me gustan (con scroll y acciones) ---
+    async function incrementarVistas(videoId) {
+        try {
+            await fetch(`https://parcial-final-avanzada-production-cdde.up.railway.app/video/incrementar-vistas/${videoId}`, { method: 'POST' });
+        } catch {}
     }
 
     // Modal de video (reutiliza lógica de principal.js simplificada)
