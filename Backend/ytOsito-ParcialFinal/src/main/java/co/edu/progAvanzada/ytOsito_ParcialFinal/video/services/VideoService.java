@@ -149,4 +149,14 @@ public class VideoService {
         video.setVistas(video.getVistas() + 1);
         return videoRepository.save(video);
     }
+    
+    /**
+     * Busca videos cuyo título contenga la cadena especificada (ignorando mayúsculas/minúsculas).
+     * 
+     * @param titulo la cadena a buscar en el título del video
+     * @return una lista de videos que contienen la cadena en el título
+     */
+    public List<Video> buscarVideosPorTitulo(String titulo) {
+        return videoRepository.findByTituloContainingIgnoreCase(titulo);
+    }
 }

@@ -2,6 +2,9 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.controllers;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.services.UsuarioService;
+import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
