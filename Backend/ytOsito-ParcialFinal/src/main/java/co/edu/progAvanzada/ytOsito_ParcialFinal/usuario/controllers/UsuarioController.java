@@ -2,6 +2,9 @@ package co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.controllers;
 
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.entities.Usuario;
 import co.edu.progAvanzada.ytOsito_ParcialFinal.usuario.services.UsuarioService;
+import co.edu.progAvanzada.ytOsito_ParcialFinal.video.entities.Video;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -167,5 +170,17 @@ public class UsuarioController {
     @GetMapping("/{usuarioId}/suscriptores/count")
     public long contarSuscriptores(@Valid @PathVariable Long usuarioId) {
         return usuarioService.contarSuscriptores(usuarioId);
+    }
+    
+    /**
+     * Obtiene la lista de videos que le gustan a un usuario.
+     * 
+     * @param usuarioId ID del usuario del que se quieren obtener los videos que le gustan
+     * @return Lista de videos que le gustan al usuario
+     * @throws EntityNotFoundException Si el usuario no existe
+     */
+    @GetMapping("/{usuarioId}/videos-que-me-gustan")
+    public List<Video> obtenerVideosQueMeGustan(@Valid @PathVariable Long usuarioId) {
+        return usuarioService.obtenerVideosQueMeGustan(usuarioId);
     }
 }

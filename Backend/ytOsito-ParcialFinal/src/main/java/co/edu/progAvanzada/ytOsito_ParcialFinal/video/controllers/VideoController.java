@@ -119,4 +119,15 @@ public class VideoController {
     public Video incrementarVistas(@PathVariable Long id) {
         return videoService.incrementarVistas(id);
     }
+    
+    /**
+     * Busca videos cuyo título contenga la cadena especificada (ignorando mayúsculas/minúsculas).
+     * 
+     * @param titulo la cadena a buscar en el título del video
+     * @return una lista de videos que contienen la cadena en el título
+     */
+    @GetMapping("/buscar")
+    public List<Video> buscarVideosPorTitulo(@RequestParam String titulo) {
+        return videoService.buscarVideosPorTitulo(titulo);
+    }
 }
