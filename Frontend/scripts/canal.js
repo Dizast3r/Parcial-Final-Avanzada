@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Evento para mostrar el video pequeño al hacer click en la miniatura
             const miniatura = div.querySelector('img');
             miniatura.addEventListener('click', () => {
-                mostrarVideoMini(video.url, video.titulo);
+                mostrarVideoMini(video.url, video.titulo, video.descripcion);
             });
             
             videosList.appendChild(div);
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Mostrar video pequeño en el lugar
-    function mostrarVideoMini(url, titulo) {
+    function mostrarVideoMini(url, titulo, descripcion) {
         // Crear overlay para el video
         let overlay = document.createElement('div');
         overlay.style.position = 'fixed';
@@ -250,10 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.alignItems = 'center';
         overlay.innerHTML = `
             <div style="background:#232323;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;align-items:center;">
-                <h3 style="color:#fff;margin-bottom:1rem;">${titulo}</h3>
-                <video src="${url}" controls style="width:320px;height:180px;border-radius:10px;background:#000;"></video>
-                <button id="cerrarVideoMini" style="margin-top:1.2rem;padding:0.5rem 1.5rem;background:#7614a3;color:#fff;border:none;border-radius:8px;cursor:pointer;">Cerrar</button>
-            </div>
+            <h3 style="color:#fff;margin-bottom:1rem;">${titulo}</h3>
+            <video src="${url}" controls style="width:320px;height:180px;border-radius:10px;background:#000;"></video>
+            <p style="color:#ccc;margin-top:1rem;font-size:0.95rem;text-align:center;">${descripcion}</p>
+            <button id="cerrarVideoMini" style="margin-top:1.2rem;padding:0.5rem 1.5rem;background:#7614a3;color:#fff;border:none;border-radius:8px;cursor:pointer;">Cerrar</button>
+        </div>
         `;
         document.body.appendChild(overlay);
         
